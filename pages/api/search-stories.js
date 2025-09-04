@@ -215,7 +215,7 @@ export default async function handler(req, res) {
       return res.status(200).json({
         fallback: true,
         message: "Sorry, we don't have any stories matching your situation right now. Try sharing a few words (like 'job loss', 'illness', 'faith').",
-        remaining: rateLimitResult.remaining - 1
+        remaining: rateLimitResult.remaining
       });
     }
 
@@ -231,7 +231,7 @@ export default async function handler(req, res) {
       practice: getRandomFromArray(practicesByTopic[topic] || practicesByTopic.other),
       nextSteps: getRandomFromArray(gentleNextSteps[topic] || gentleNextSteps.other),
       gratitude: getRandomFromArray(gratitudePrompts),
-      remaining: rateLimitResult.remaining - 1
+      remaining: rateLimitResult.remaining
     };
 
     res.status(200).json(response);

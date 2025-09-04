@@ -17,12 +17,16 @@ export function checkRateLimit(fingerprint, ip) {
     };
   }
   
-  // Update counts
+  // Update counts FIRST
   limits.set(fingerprintKey, fingerprintCount + 1);
   limits.set(ipKey, ipCount + 1);
   
+  // Calculate remaining AFTER incrementing
+  const newFingerprintCount = fingerprintCount + 1;
+  const newIpCount = ipCount + 1;
+  
   return { 
     allowed: true, 
-    remaining: Math.min(3 - fingerprintCount - 1, 3 - ipCount - 1)
+    remaining: Math.min(3 - newFingerprintCount, 3 - newIpCount)
   };
 }
