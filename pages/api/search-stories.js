@@ -1,0 +1,90 @@
+import { OpenAI } from 'openai';
+import stories from '../../data/stories.json';
+import { checkRateLimit } from '../../utils/rateLimit';
+import { detectBot } from '../../utils/botDetection';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    // Bot detection
+    if (detectBot(req)) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const { question, topic, fingerprint } = req.body;
+
+    if (!question || !topic || !fingerprint) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Rate limiting
+    const rateLimitResult = checkRateLimit(fingerprint, req.ip);
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({ 
+        error: 'rate_limit',
+        remaining: 0 
+      });
+    }
+
+    // Clean question (remove salutations)
+    const cleanedQuestion = question
+      .replace(/^(ram\s+ram|ram|baba|maharaj-?ji|maharaj)\s*/gi, '')
+      .trim();
+
+    // Create embedding for the question
+    const embedding = await openai.embeddings.create({
+      model: "text-embedding-3-large",
+      input: `${cleanedQuestion} ${topic}`,
+    });
+
+    const questionEmbedding = embedding.data[0].embedding;
+
+    // Calculate similarity with stories (simplified cosine similarity)
+    const scoredStories = stories.map(story => {
+      // For demo purposes, using text matching since we don't have pre-computed embeddings
+      // In production, you'd store embeddings and do proper vector similarity
+      const searchText = `${story.content} ${story.life_situations} ${story.emotions} ${story.themes}`.toLowerCase();
+      const queryTerms = cleanedQuestion.toLowerCase().split(' ');
+      
+      let score = 0;
+      queryTerms.forEach(term => {
+        if (searchText.includes(term)) {
+          score += 1;
+        }
+      });
+      
+      // Topic boost
+      if (story.life_situations.toLowerCase().includes(topic.toLowerCase()) ||
+          story.themes.toLowerCase().includes(topic.toLowerCase())) {
+        score += 2;
+      }
+
+      return {
+        ...story,
+        similarity: score / queryTerms.length
+      };
+    });
+
+    // Filter and sort by similarity
+    const relevantStories = scoredStories
+      .filter(story => story.similarity > 0.1) // Minimum threshold
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 3); // Top 3 results
+
+    res.status(200).json({
+      stories: relevantStories,
+      remaining: rateLimitResult.remaining - 1
+    });
+
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}

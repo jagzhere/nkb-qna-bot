@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Darshan - Neem Karoli Baba</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef9e7 0%, #fdf2e9 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #7A0019;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #FF6A00;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #e55a00;
+        }
+
+        /* Main Darshan Card */
+        .darshan-card {
+            background: linear-gradient(135deg, #7A0019, #a4002a);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 40px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(122, 0, 25, 0.3);
+            text-align: center;
+        }
+
+        .darshan-image {
+            margin-bottom: 30px;
+        }
+
+        .darshan-image img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .darshan-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .darshan-quote {
+            font-size: 1.8rem;
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .darshan-attribution {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .darshan-date {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+        }
+
+        /* Additional Content */
+        .reflection-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .reflection-section h3 {
+            color: #7A0019;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .reflection-section p {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Practice Section */
+        .practice-section {
+            background: #fff9f0;
+            border-left: 5px solid #FF6A00;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .practice-section h3 {
+            color: #FF6A00;
+            margin-bottom: 15px;
+        }
+
+        .practice-steps {
+            list-style: none;
+        }
+
+        .practice-steps li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .practice-steps li:before {
+            content: "🙏";
+            position: absolute;
+            left: 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .darshan-card {
+                padding: 30px 20px;
+            }
+
+            .darshan-image img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .darshan-quote {
+                font-size: 1.4rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <a href="/" class="back-button">
+            ← Back to Stories
+        </a>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Daily Darshan</h1>
+            <p>Receive Maharaj-ji's blessings every day</p>
+        </div>
+
+        <!-- Main Darshan Card -->
+        <div class="darshan-card">
+            <div class="darshan-image">
+                <img id="darshanImage" src="" alt="Neem Karoli Baba" />
+            </div>
+            <blockquote class="darshan-quote" id="darshanQuote"></blockquote>
+            <div class="darshan-attribution">- Neem Karoli Baba</div>
+            <div class="darshan-date" id="darshanDate"></div>
+        </div>
+
+        <!-- Reflection Section -->
+        <div class="reflection-section">
+            <h3>Today's Reflection</h3>
+            <p id="todaysReflection"></p>
+        </div>
+
+        <!-- Practice Section -->
+        <div class="practice-section">
+            <h3>Daily Practice</h3>
+            <ul class="practice-steps">
+                <li>Sit quietly for a few minutes in Maharaj-ji's presence</li>
+                <li>Repeat "Ram Ram" with each breath</li>
+                <li>Contemplate today's teaching throughout your day</li>
+                <li>Serve someone without expectation</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Same darshan quotes and images system as homepage
+        const darshanQuotes = [
+            "Love everyone, serve everyone, remember God.",
+            "Be like a tree and let the dead leaves drop.",
+            "The best form to worship God is every form.",
+            "It is better to see God in everything than to try to figure it out.",
+            "Attach the mind to God and do your work.",
+            "All action is prayer.",
+            "Tell the truth, tell the truth, tell the truth.",
+            "The heart is the hub of all sacred places. Go there and roam.",
+            "By serving others you serve God.",
+            "Don't be afraid, God is with you.",
+            "Ram will provide. He always provides.",
+            "Give up anger, give up pride, and free yourself from worldly bondage.",
+            "Serve people. God is in everyone.",
+            "Love is the strongest medicine.",
+            "God is everywhere, but you don't see him.",
+            "Bhakti is the only thing. Love God and serve people.",
+            "Simple is the best. Be simple.",
+            "Whatever you do, surrender the result to God.",
+            "Everything is One. There is no duality.",
+            "See God in everyone and serve everyone as God.",
+            "The guru's grace removes the disciple's suffering.",
+            "Always remember God and keep your heart clean.",
+            "Faith is the most important thing. Have faith in God.",
+            "Do not get attached to the world. It is all illusion.",
+            "Work without expectation of reward.",
+            "Turn your face toward God and the whole world will seem different.",
+            "God's love is the only reality.",
+            "Surrender everything to God and be free from worry.",
+            "Be content with what you have and always remember God.",
+            "Service to humanity is service to God."
+        ];
+
+        const reflections = [
+            "When we truly love everyone, we discover that love is not something we give or receive, but something we are.",
+            "Like autumn leaves that fall naturally, let go of what no longer serves your spiritual growth.",
+            "Every person you meet today is a form of the Divine. Can you see beyond the surface?",
+            "Stop trying to understand God with your mind. Feel God with your heart instead.",
+            "Whatever work you do today, dedicate it as an offering to the Divine.",
+            "Even the smallest act, when done with love and awareness, becomes a prayer.",
+            "Truth is not just about facts. It's about living authentically from your heart.",
+            "Your heart contains all the sacred spaces you need. Journey inward.",
+            "Every act of service is actually service to your own true Self.",
+            "Fear dissolves when you remember that you are never truly alone.",
+            "Trust that everything you need will be provided at the right time.",
+            "Freedom comes not from having more, but from needing less.",
+            "Look for opportunities to serve others today, however small they may be.",
+            "Love has the power to heal what nothing else can touch.",
+            "Practice seeing the Divine presence in ordinary moments today.",
+            "Devotion is not about rituals. It's about the love that fills your heart.",
+            "Simplicity in thought, word, and deed brings peace to the mind.",
+            "Work with dedication, but don't be attached to the outcomes.",
+            "See past the illusion of separation. We are all One.",
+            "Treat every person you encounter today as you would treat God.",
+            "Grace flows through surrender, not through struggle.",
+            "Keep your intentions pure and your heart open to receive guidance.",
+            "Faith is not blind belief. It's trust born from love.",
+            "Notice what you're attached to. Can you practice letting go?",
+            "Do your duties without expecting anything in return. This is freedom.",
+            "When you turn toward the light, even shadows become beautiful.",
+            "In the end, only love remains. Everything else is temporary.",
+            "Worry is prayer in reverse. Choose surrender instead.",
+            "Contentment is the greatest wealth. What are you grateful for today?",
+            "Every person you serve is serving you in return by giving you the chance to love."
+        ];
+
+        const imageFilenames = [
+            'nkb-1.jpg', 'nkb-2.jpg', 'nkb-3.jpg', 'nkb-4.jpg', 'nkb-5.jpg',
+            'nkb-6.jpg', 'nkb-7.jpg', 'nkb-8.jpg', 'nkb-9.jpg', 'nkb-10.jpg',
+            'nkb-11.jpg', 'nkb-12.jpg', 'nkb-13.jpg', 'nkb-14.jpg', 'nkb-15.jpg',
+            'nkb-16.jpg', 'nkb-17.jpg', 'nkb-18.jpg', 'nkb-19.jpg', 'nkb-20.jpg',
+            'nkb-21.jpg', 'nkb-22.jpg', 'nkb-23.jpg', 'nkb-24.jpg', 'nkb-25.jpg',
+            'nkb-26.jpg', 'nkb-27.jpg', 'nkb-28.jpg', 'nkb-29.jpg', 'nkb-30.jpg'
+        ];
+
+        function loadDailyDarshan() {
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            
+            const quoteIndex = dayOfYear % darshanQuotes.length;
+            const imageIndex = dayOfYear % imageFilenames.length;
+            const reflectionIndex = dayOfYear % reflections.length;
+            
+            // Set content
+            document.getElementById('darshanQuote').textContent = darshanQuotes[quoteIndex];
+            document.getElementById('todaysReflection').textContent = reflections[reflectionIndex];
+            document.getElementById('darshanDate').textContent = `Today's Darshan - ${today.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            })}`;
+            
+            // Set image with error handling
+            const imagePath = `/images/darshan/${imageFilenames[imageIndex]}`;
+            const imageElement = document.getElementById('darshanImage');
+            
+            imageElement.onload = function() {
+                console.log('Daily Darshan image loaded successfully');
+            };
+            
+            imageElement.onerror = function() {
+                console.log('Daily Darshan image not found, using placeholder');
+                this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4zKSIvPjx0ZXh0IHg9IjEwMCIgeT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIj5OZWVtIEthcm9saTwvdGV4dD48dGV4dCB4PSIxMDAiIHk9IjExNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPkJhYmE8L3RleHQ+PC9zdmc+';
+            };
+            
+            imageElement.src = imagePath;
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', loadDailyDarshan);
+    </script>
+</body>
+</html>
