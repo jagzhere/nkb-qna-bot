@@ -254,6 +254,188 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Response Sections */
+        .response-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .empathy-section {
+            background: #f0f9ff;
+            border-left: 4px solid #FF6A00;
+            font-style: italic;
+            color: #555;
+        }
+
+        .stories-section h3 {
+            color: #7A0019;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .story-card {
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .story-card:hover {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .story-card h4 {
+            color: #7A0019;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .story-preview {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .story-full {
+            display: none;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .story-source {
+            font-size: 0.85rem;
+            color: #888;
+            font-style: italic;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .read-more-btn {
+            background: #7A0019;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .read-more-btn:hover {
+            background: #5a0013;
+        }
+
+        .reflection-section {
+            background: #fff9f0;
+            border-left: 4px solid #7A0019;
+        }
+
+        .community-section {
+            background: #f8f9ff;
+            border-left: 4px solid #4CAF50;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .practice-section {
+            background: #fff5f0;
+            border-left: 4px solid #FF6A00;
+        }
+
+        .practice-section h4 {
+            color: #FF6A00;
+            margin-bottom: 10px;
+        }
+
+        .nextsteps-section {
+            background: #f0f9ff;
+            border-left: 4px solid #2196F3;
+        }
+
+        .nextsteps-section h4 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+
+        .gratitude-section {
+            background: #f8f5ff;
+            border-left: 4px solid #9C27B0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .feedback-section {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .feedback-buttons {
+            margin-top: 10px;
+        }
+
+        .feedback-btn {
+            margin: 0 5px;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .feedback-yes {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .feedback-no {
+            background: #f44336;
+            color: white;
+        }
+
+        .load-more-btn {
+            width: 100%;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .load-more-btn:hover {
+            background: #e8e8e8;
+        }
+
+        /* Error/Fallback */
+        .fallback-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .fallback-message .emoji {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .try-again-btn {
+            background: #FF6A00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .main-content {
@@ -288,58 +470,10 @@
             .results-section {
                 padding: 20px;
             }
-        }
 
-        /* Story Cards (for when results load) */
-        .story-card {
-            background: #fafafa;
-            border: 1px solid #e8e8e8;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: box-shadow 0.3s ease;
-        }
-
-        .story-card:hover {
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-
-        .story-card h4 {
-            color: #7A0019;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .read-more-btn {
-            background: #7A0019;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        .read-more-btn:hover {
-            background: #5a0013;
-        }
-
-        .load-more-btn {
-            width: 100%;
-            background: #f0f0f0;
-            color: #333;
-            border: 1px solid #ddd;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .load-more-btn:hover {
-            background: #e8e8e8;
+            .response-section {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -353,11 +487,11 @@
 
         <!-- Navigation Cards -->
         <div class="nav-cards">
-            <a href="/daily-darshan" class="nav-card daily-darshan">
+            <a href="/daily-darshan.html" class="nav-card daily-darshan">
                 <h3>🙏 Daily Darshan</h3>
                 <p>Connect with Maharaj-ji daily</p>
             </a>
-            <a href="/guided-meditation" class="nav-card guided-meditation">
+            <a href="/guided-meditation.html" class="nav-card guided-meditation">
                 <h3>🧘 Guided Meditation</h3>
                 <p>Ram Ram meditation practice</p>
             </a>
@@ -429,86 +563,41 @@
                 <div id="resultsContent" style="display: none;">
                     <!-- Results will be populated here -->
                 </div>
+                
+                <div class="fallback-message" id="fallbackMessage" style="display: none;">
+                    <span class="emoji">🙏</span>
+                    <p id="fallbackText"></p>
+                    <button class="try-again-btn" onclick="resetForm()">Ask differently</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Daily Darshan rotation system
-        const darshanQuotes = [
-            "Love everyone, serve everyone, remember God.",
-            "Be like a tree and let the dead leaves drop.",
-            "The best form to worship God is every form.",
-            "It is better to see God in everything than to try to figure it out.",
-            "Attach the mind to God and do your work.",
-            "All action is prayer.",
-            "Tell the truth, tell the truth, tell the truth.",
-            "The heart is the hub of all sacred places. Go there and roam.",
-            "By serving others you serve God.",
-            "Don't be afraid, God is with you.",
-            "Ram will provide. He always provides.",
-            "Give up anger, give up pride, and free yourself from worldly bondage.",
-            "Serve people. God is in everyone.",
-            "Love is the strongest medicine.",
-            "God is everywhere, but you don't see him.",
-            "Bhakti is the only thing. Love God and serve people.",
-            "Simple is the best. Be simple.",
-            "Whatever you do, surrender the result to God.",
-            "Everything is One. There is no duality.",
-            "See God in everyone and serve everyone as God.",
-            "The guru's grace removes the disciple's suffering.",
-            "Always remember God and keep your heart clean.",
-            "Faith is the most important thing. Have faith in God.",
-            "Do not get attached to the world. It is all illusion.",
-            "Work without expectation of reward.",
-            "Turn your face toward God and the whole world will seem different.",
-            "God's love is the only reality.",
-            "Surrender everything to God and be free from worry.",
-            "Be content with what you have and always remember God.",
-            "Service to humanity is service to God."
-        ];
+        let currentFingerprint = null;
+        let loadedStoryCount = 0;
 
-        const imageFilenames = [
-            'nkb-1.jpg', 'nkb-2.jpg', 'nkb-3.jpg', 'nkb-4.jpg', 'nkb-5.jpg',
-            'nkb-6.jpg', 'nkb-7.jpg', 'nkb-8.jpg', 'nkb-9.jpg', 'nkb-10.jpg',
-            'nkb-11.jpg', 'nkb-12.jpg', 'nkb-13.jpg', 'nkb-14.jpg', 'nkb-15.jpg',
-            'nkb-16.jpg', 'nkb-17.jpg', 'nkb-18.jpg', 'nkb-19.jpg', 'nkb-20.jpg',
-            'nkb-21.jpg', 'nkb-22.jpg', 'nkb-23.jpg', 'nkb-24.jpg', 'nkb-25.jpg',
-            'nkb-26.jpg', 'nkb-27.jpg', 'nkb-28.jpg', 'nkb-29.jpg', 'nkb-30.jpg'
-        ];
-
-        function loadDailyDarshan() {
-            // Get current date and create a seed for consistent daily rotation
-            const today = new Date();
-            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        // Generate browser fingerprint
+        function generateFingerprint() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('Browser fingerprint', 2, 2);
             
-            // Use day of year as seed for consistent daily selection
-            const quoteIndex = dayOfYear % darshanQuotes.length;
-            const imageIndex = dayOfYear % imageFilenames.length;
-            
-            // Set the quote
-            document.getElementById('darshanQuote').textContent = darshanQuotes[quoteIndex];
-            
-            // Set image with better error handling
-            const imagePath = `/images/darshan/${imageFilenames[imageIndex]}`;
-            const imageElement = document.getElementById('darshanImage');
-            
-            // Set image with fallback and error handling
-            imageElement.onload = function() {
-                console.log('Daily Darshan image loaded successfully');
-            };
-            
-            imageElement.onerror = function() {
-                // Fallback to a more visible placeholder
-                console.log('Daily Darshan image not found, using placeholder');
-                this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNzUiIGN5PSI3NSIgcj0iNzUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4yKSIvPjx0ZXh0IHg9Ijc1IiB5PSI2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5lZW0gS2Fyb2xpPC90ZXh0Pjx0ZXh0IHg9Ijc1IiB5PSI4NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPkJhYmE8L3RleHQ+PC9zdmc+';
-            };
-            
-            imageElement.src = imagePath;
+            const fingerprint = canvas.toDataURL() + 
+                navigator.userAgent + 
+                screen.width + 'x' + screen.height + 
+                new Date().getTimezoneOffset() + 
+                navigator.language;
+                
+            return btoa(fingerprint).substring(0, 32);
         }
 
-        // Load Daily Darshan on page load
-        document.addEventListener('DOMContentLoaded', loadDailyDarshan);
+        // Initialize fingerprint on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            currentFingerprint = generateFingerprint();
+        });
 
         // Word count functionality
         const questionInput = document.getElementById('questionInput');
@@ -520,7 +609,6 @@
             const words = text === '' ? [] : text.split(/\s+/);
             const wordLength = words.length;
             
-            // Auto-truncate at 25 words
             if (wordLength > 25) {
                 const truncated = words.slice(0, 25).join(' ');
                 this.value = truncated;
@@ -533,7 +621,7 @@
         });
 
         // Ask button functionality
-        askButton.addEventListener('click', function() {
+        askButton.addEventListener('click', async function() {
             const question = questionInput.value.trim();
             const selectedTopic = document.querySelector('input[name="topic"]:checked');
             
@@ -551,69 +639,208 @@
             document.getElementById('welcomeMessage').style.display = 'none';
             document.getElementById('loadingState').style.display = 'block';
             document.getElementById('resultsContent').style.display = 'none';
+            document.getElementById('fallbackMessage').style.display = 'none';
 
-            // Here you would normally make an API call
-            // For now, we'll simulate a response
-            setTimeout(() => {
-                showSampleResults();
-            }, 2000);
+            try {
+                const response = await fetch('/api/search-stories', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        topic: selectedTopic.value,
+                        fingerprint: currentFingerprint
+                    })
+                });
+
+                const data = await response.json();
+
+                document.getElementById('loadingState').style.display = 'none';
+
+                if (response.status === 429) {
+                    // Rate limit exceeded
+                    document.getElementById('fallbackMessage').style.display = 'block';
+                    document.getElementById('fallbackText').textContent = 'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
+                    return;
+                }
+
+                if (data.fallback) {
+                    // No matching stories found
+                    document.getElementById('fallbackMessage').style.display = 'block';
+                    document.getElementById('fallbackText').textContent = data.message;
+                    return;
+                }
+
+                // Display results
+                displayResults(data);
+                loadedStoryCount = data.stories.length;
+
+                // Scroll to results on mobile
+                if (window.innerWidth <= 768) {
+                    document.querySelector('.results-section').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('fallbackMessage').style.display = 'block';
+                document.getElementById('fallbackText').textContent = 'Something went wrong. Please try again.';
+            }
         });
 
-        // Sample results display (replace with actual API integration)
-        function showSampleResults() {
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('resultsContent').style.display = 'block';
-            
+        // Display results function
+        function displayResults(data) {
             const resultsContent = document.getElementById('resultsContent');
-            resultsContent.innerHTML = `
-                <div style="margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #FF6A00;">
-                    <p><em>I'm sorry you're going through this. Let's look at what the sources say and a small practice.</em></p>
-                </div>
+            
+            let html = '';
 
-                <h3 style="color: #7A0019; margin-bottom: 15px;">What the sources say</h3>
-                
-                <div class="story-card">
-                    <h4>Story 1: Finding Peace in Uncertainty</h4>
-                    <p>Sometimes life throws challenges that seem impossible to overcome. But remember, every storm passes...</p>
-                    <button class="read-more-btn">Read more</button>
-                </div>
+            // 1. Empathy line
+            if (data.empathy) {
+                html += `
+                    <div class="response-section empathy-section">
+                        <p><em>${data.empathy}</em></p>
+                    </div>
+                `;
+            }
 
-                <div class="story-card">
-                    <h4>Story 2: Surrendering to Grace</h4>
-                    <p>A devotee shares how letting go of control brought unexpected blessings...</p>
-                    <button class="read-more-btn">Read more</button>
-                </div>
+            // 2. What the sources say
+            if (data.stories && data.stories.length > 0) {
+                html += `
+                    <div class="response-section stories-section">
+                        <h3>What the sources say</h3>
+                `;
 
-                <div class="story-card">
-                    <h4>Story 3: Trust in Divine Timing</h4>
-                    <p>When everything seems to go wrong, remember that Maharaj-ji's love never fails...</p>
-                    <button class="read-more-btn">Read more</button>
-                </div>
+                data.stories.forEach((story, index) => {
+                    const storyId = `story-${index}`;
+                    const preview = story.content.substring(0, 150) + (story.content.length > 150 ? '...' : '');
+                    
+                    html += `
+                        <div class="story-card">
+                            <h4>${story.title}</h4>
+                            <div class="story-preview" id="preview-${storyId}">
+                                ${preview}
+                            </div>
+                            <div class="story-full" id="full-${storyId}">
+                                ${story.content}
+                                <div class="story-source">
+                                    <strong>Source:</strong> ${story.source_url}
+                                </div>
+                            </div>
+                            <button class="read-more-btn" onclick="toggleStory('${storyId}')" id="btn-${storyId}">
+                                Read more
+                            </button>
+                        </div>
+                    `;
+                });
 
-                <button class="load-more-btn">Load more stories</button>
+                html += `</div>`;
+            }
 
-                <div style="margin: 30px 0; padding: 20px; background: #fff9f0; border-radius: 8px; border-left: 4px solid #7A0019;">
-                    <h4 style="color: #7A0019; margin-bottom: 10px;">Practice</h4>
-                    <p>Take a quiet breath, repeat 'Ram Ram' a few times, and know you are not alone.</p>
-                </div>
+            // 3. Reflection question
+            if (data.reflection) {
+                html += `
+                    <div class="response-section reflection-section">
+                        <h4>Reflection</h4>
+                        <p>${data.reflection}</p>
+                    </div>
+                `;
+            }
 
-                <div style="text-align: center; margin-top: 25px;">
+            // 4. Community element
+            if (data.community) {
+                html += `
+                    <div class="response-section community-section">
+                        <p>✨ ${data.community}</p>
+                    </div>
+                `;
+            }
+
+            // 5. Practice suggestion
+            if (data.practice) {
+                html += `
+                    <div class="response-section practice-section">
+                        <h4>Practice</h4>
+                        <p>${data.practice}</p>
+                    </div>
+                `;
+            }
+
+            // 6. Gentle next steps
+            if (data.nextSteps) {
+                html += `
+                    <div class="response-section nextsteps-section">
+                        <h4>When You're Ready</h4>
+                        <p>${data.nextSteps}</p>
+                    </div>
+                `;
+            }
+
+            // 7. Gratitude prompt
+            if (data.gratitude) {
+                html += `
+                    <div class="response-section gratitude-section">
+                        <p>${data.gratitude}</p>
+                    </div>
+                `;
+            }
+
+            // Feedback section
+            html += `
+                <div class="feedback-section">
                     <p><strong>🙏 Did this answer help you?</strong></p>
-                    <div style="margin-top: 10px;">
-                        <button style="background: #4CAF50; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin: 0 5px; cursor: pointer;">Yes</button>
-                        <button style="background: #f44336; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin: 0 5px; cursor: pointer;">No</button>
+                    <div class="feedback-buttons">
+                        <button class="feedback-btn feedback-yes" onclick="submitFeedback('yes')">Yes</button>
+                        <button class="feedback-btn feedback-no" onclick="submitFeedback('no')">No</button>
                     </div>
                 </div>
             `;
+
+            resultsContent.innerHTML = html;
+            document.getElementById('resultsContent').style.display = 'block';
         }
 
-        // Mobile scroll to results after submission
-        function scrollToResults() {
-            if (window.innerWidth <= 768) {
-                document.querySelector('.results-section').scrollIntoView({
-                    behavior: 'smooth'
-                });
+        // Toggle story expand/collapse
+        function toggleStory(storyId) {
+            const preview = document.getElementById(`preview-${storyId}`);
+            const full = document.getElementById(`full-${storyId}`);
+            const btn = document.getElementById(`btn-${storyId}`);
+
+            if (full.style.display === 'none' || full.style.display === '') {
+                preview.style.display = 'none';
+                full.style.display = 'block';
+                btn.textContent = 'Show less';
+            } else {
+                preview.style.display = 'block';
+                full.style.display = 'none';
+                btn.textContent = 'Read more';
             }
+        }
+
+        // Submit feedback
+        function submitFeedback(feedback) {
+            // Here you would send feedback to your analytics API
+            console.log('Feedback:', feedback);
+            
+            // Show thank you message
+            const buttons = document.querySelector('.feedback-buttons');
+            buttons.innerHTML = '<p style="color: #4CAF50; margin-top: 10px;">Thank you for your feedback! 🙏</p>';
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('questionInput').value = '';
+            document.getElementById('wordCount').textContent = '0/25 words (auto-truncated)';
+            document.querySelectorAll('input[name="topic"]').forEach(radio => radio.checked = false);
+            
+            document.getElementById('welcomeMessage').style.display = 'block';
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'none';
+            document.getElementById('fallbackMessage').style.display = 'none';
+            
+            loadedStoryCount = 0;
         }
     </script>
 </body>
