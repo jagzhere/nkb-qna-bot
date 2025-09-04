@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NKB QnA Bot - Devotees' Stories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef9e7 0%, #fdf2e9 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #7A0019;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Navigation Cards */
+        .nav-cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #FF6A00;
+        }
+
+        .daily-darshan {
+            background: linear-gradient(135deg, #7A0019, #a4002a);
+            color: white;
+        }
+
+        .guided-meditation {
+            background: linear-gradient(135deg, #FF6A00, #ff8533);
+            color: white;
+        }
+
+        .nav-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .nav-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        /* Ask Section */
+        .ask-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .ask-section h2 {
+            color: #7A0019;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s ease;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: #FF6A00;
+        }
+
+        .word-count {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Topic Selection */
+        .topic-section {
+            margin-bottom: 25px;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .topic-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .topic-option:hover {
+            background-color: #fff5f0;
+        }
+
+        .topic-option input[type="radio"] {
+            accent-color: #FF6A00;
+        }
+
+        .topic-option label {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Ask Button */
+        .ask-button {
+            width: 100%;
+            padding: 15px;
+            background: #FF6A00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .ask-button:hover {
+            background: #e55a00;
+        }
+
+        .ask-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .results-section h2 {
+            color: #7A0019;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        .welcome-message .emoji {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #FF6A00;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #FF6A00;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-card {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+            }
+
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .ask-section,
+            .results-section {
+                padding: 20px;
+            }
+        }
+
+        /* Story Cards (for when results load) */
+        .story-card {
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .story-card:hover {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .story-card h4 {
+            color: #7A0019;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .read-more-btn {
+            background: #7A0019;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .read-more-btn:hover {
+            background: #5a0013;
+        }
+
+        .load-more-btn {
+            width: 100%;
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .load-more-btn:hover {
+            background: #e8e8e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Devotees' Stories and Experiences</h1>
+            <p>You AREN'T Alone</p>
+        </div>
+
+        <!-- Navigation Cards -->
+        <div class="nav-cards">
+            <a href="/daily-darshan" class="nav-card daily-darshan">
+                <h3>🙏 Daily Darshan</h3>
+                <p>Connect with Maharaj-ji daily</p>
+            </a>
+            <a href="/guided-meditation" class="nav-card guided-meditation">
+                <h3>🧘 Guided Meditation</h3>
+                <p>Ram Ram meditation practice</p>
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Ask Section -->
+            <div class="ask-section">
+                <h2>What's in your heart</h2>
+                
+                <div class="input-group">
+                    <textarea 
+                        class="question-input" 
+                        placeholder="Share what's troubling you..."
+                        maxlength="150"
+                        id="questionInput"
+                    ></textarea>
+                    <div class="word-count" id="wordCount">0/25 words (auto-truncated)</div>
+                </div>
+
+                <div class="topic-section">
+                    <label><strong>Topic (helps us find relevant stories)</strong></label>
+                    <div class="topic-grid">
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="work" id="work">
+                            <label for="work">Work/Finances</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="relationships" id="relationships">
+                            <label for="relationships">Relationships/Family</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="health" id="health">
+                            <label for="health">Health/Body</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="grief" id="grief">
+                            <label for="grief">Grief/Loss</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="faith" id="faith">
+                            <label for="faith">Faith/Practice</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="other" id="other">
+                            <label for="other">Other</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="ask-button" id="askButton">Ask</button>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section">
+                <h2>Stories for You</h2>
+                
+                <div class="welcome-message" id="welcomeMessage">
+                    <span class="emoji">🙏</span>
+                    <p>Ask your question and discover stories from fellow devotees who've walked similar paths.</p>
+                </div>
+
+                <div class="loading" id="loadingState" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>🙏 Maharajji is listening...</p>
+                </div>
+
+                <div id="resultsContent" style="display: none;">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Daily Darshan rotation system
+        const darshanQuotes = [
+            "Love everyone, serve everyone, remember God.",
+            "Be like a tree and let the dead leaves drop.",
+            "The best form to worship God is every form.",
+            "It is better to see God in everything than to try to figure it out.",
+            "Attach the mind to God and do your work.",
+            "All action is prayer.",
+            "Tell the truth, tell the truth, tell the truth.",
+            "The heart is the hub of all sacred places. Go there and roam.",
+            "By serving others you serve God.",
+            "Don't be afraid, God is with you.",
+            "Ram will provide. He always provides.",
+            "Give up anger, give up pride, and free yourself from worldly bondage.",
+            "Serve people. God is in everyone.",
+            "Love is the strongest medicine.",
+            "God is everywhere, but you don't see him.",
+            "Bhakti is the only thing. Love God and serve people.",
+            "Simple is the best. Be simple.",
+            "Whatever you do, surrender the result to God.",
+            "Everything is One. There is no duality.",
+            "See God in everyone and serve everyone as God.",
+            "The guru's grace removes the disciple's suffering.",
+            "Always remember God and keep your heart clean.",
+            "Faith is the most important thing. Have faith in God.",
+            "Do not get attached to the world. It is all illusion.",
+            "Work without expectation of reward.",
+            "Turn your face toward God and the whole world will seem different.",
+            "God's love is the only reality.",
+            "Surrender everything to God and be free from worry.",
+            "Be content with what you have and always remember God.",
+            "Service to humanity is service to God."
+        ];
+
+        const imageFilenames = [
+            'nkb-1.jpg', 'nkb-2.jpg', 'nkb-3.jpg', 'nkb-4.jpg', 'nkb-5.jpg',
+            'nkb-6.jpg', 'nkb-7.jpg', 'nkb-8.jpg', 'nkb-9.jpg', 'nkb-10.jpg',
+            'nkb-11.jpg', 'nkb-12.jpg', 'nkb-13.jpg', 'nkb-14.jpg', 'nkb-15.jpg',
+            'nkb-16.jpg', 'nkb-17.jpg', 'nkb-18.jpg', 'nkb-19.jpg', 'nkb-20.jpg',
+            'nkb-21.jpg', 'nkb-22.jpg', 'nkb-23.jpg', 'nkb-24.jpg', 'nkb-25.jpg',
+            'nkb-26.jpg', 'nkb-27.jpg', 'nkb-28.jpg', 'nkb-29.jpg', 'nkb-30.jpg'
+        ];
+
+        function loadDailyDarshan() {
+            // Get current date and create a seed for consistent daily rotation
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            
+            // Use day of year as seed for consistent daily selection
+            const quoteIndex = dayOfYear % darshanQuotes.length;
+            const imageIndex = dayOfYear % imageFilenames.length;
+            
+            // Set the quote
+            document.getElementById('darshanQuote').textContent = darshanQuotes[quoteIndex];
+            
+            // Set image with better error handling
+            const imagePath = `/images/darshan/${imageFilenames[imageIndex]}`;
+            const imageElement = document.getElementById('darshanImage');
+            
+            // Set image with fallback and error handling
+            imageElement.onload = function() {
+                console.log('Daily Darshan image loaded successfully');
+            };
+            
+            imageElement.onerror = function() {
+                // Fallback to a more visible placeholder
+                console.log('Daily Darshan image not found, using placeholder');
+                this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNzUiIGN5PSI3NSIgcj0iNzUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4yKSIvPjx0ZXh0IHg9Ijc1IiB5PSI2NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPk5lZW0gS2Fyb2xpPC90ZXh0Pjx0ZXh0IHg9Ijc1IiB5PSI4NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPkJhYmE8L3RleHQ+PC9zdmc+';
+            };
+            
+            imageElement.src = imagePath;
+        }
+
+        // Load Daily Darshan on page load
+        document.addEventListener('DOMContentLoaded', loadDailyDarshan);
+
+        // Word count functionality
+        const questionInput = document.getElementById('questionInput');
+        const wordCount = document.getElementById('wordCount');
+        const askButton = document.getElementById('askButton');
+
+        questionInput.addEventListener('input', function() {
+            const text = this.value.trim();
+            const words = text === '' ? [] : text.split(/\s+/);
+            const wordLength = words.length;
+            
+            // Auto-truncate at 25 words
+            if (wordLength > 25) {
+                const truncated = words.slice(0, 25).join(' ');
+                this.value = truncated;
+                wordCount.textContent = '25/25 words (auto-truncated)';
+                wordCount.style.color = '#FF6A00';
+            } else {
+                wordCount.textContent = `${wordLength}/25 words (auto-truncated)`;
+                wordCount.style.color = '#888';
+            }
+        });
+
+        // Ask button functionality
+        askButton.addEventListener('click', function() {
+            const question = questionInput.value.trim();
+            const selectedTopic = document.querySelector('input[name="topic"]:checked');
+            
+            if (!question) {
+                alert('Please share what\'s in your heart first');
+                return;
+            }
+            
+            if (!selectedTopic) {
+                alert('Please select a topic to help us find relevant stories');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('resultsContent').style.display = 'none';
+
+            // Here you would normally make an API call
+            // For now, we'll simulate a response
+            setTimeout(() => {
+                showSampleResults();
+            }, 2000);
+        });
+
+        // Sample results display (replace with actual API integration)
+        function showSampleResults() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('resultsContent').style.display = 'block';
+            
+            const resultsContent = document.getElementById('resultsContent');
+            resultsContent.innerHTML = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px; border-left: 4px solid #FF6A00;">
+                    <p><em>I'm sorry you're going through this. Let's look at what the sources say and a small practice.</em></p>
+                </div>
+
+                <h3 style="color: #7A0019; margin-bottom: 15px;">What the sources say</h3>
+                
+                <div class="story-card">
+                    <h4>Story 1: Finding Peace in Uncertainty</h4>
+                    <p>Sometimes life throws challenges that seem impossible to overcome. But remember, every storm passes...</p>
+                    <button class="read-more-btn">Read more</button>
+                </div>
+
+                <div class="story-card">
+                    <h4>Story 2: Surrendering to Grace</h4>
+                    <p>A devotee shares how letting go of control brought unexpected blessings...</p>
+                    <button class="read-more-btn">Read more</button>
+                </div>
+
+                <div class="story-card">
+                    <h4>Story 3: Trust in Divine Timing</h4>
+                    <p>When everything seems to go wrong, remember that Maharaj-ji's love never fails...</p>
+                    <button class="read-more-btn">Read more</button>
+                </div>
+
+                <button class="load-more-btn">Load more stories</button>
+
+                <div style="margin: 30px 0; padding: 20px; background: #fff9f0; border-radius: 8px; border-left: 4px solid #7A0019;">
+                    <h4 style="color: #7A0019; margin-bottom: 10px;">Practice</h4>
+                    <p>Take a quiet breath, repeat 'Ram Ram' a few times, and know you are not alone.</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 25px;">
+                    <p><strong>🙏 Did this answer help you?</strong></p>
+                    <div style="margin-top: 10px;">
+                        <button style="background: #4CAF50; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin: 0 5px; cursor: pointer;">Yes</button>
+                        <button style="background: #f44336; color: white; border: none; padding: 8px 20px; border-radius: 5px; margin: 0 5px; cursor: pointer;">No</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mobile scroll to results after submission
+        function scrollToResults() {
+            if (window.innerWidth <= 768) {
+                document.querySelector('.results-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        }
+    </script>
+</body>
+</html>
