@@ -715,7 +715,8 @@
 
                 data.stories.forEach((story, index) => {
                     const storyId = `story-${index}`;
-                    const preview = story.content.substring(0, 150) + (story.content.length > 150 ? '...' : '');
+                    const cleanContent = story.content.replace(/\\n\\n/g, ' ').replace(/\\n/g, ' ');
+                    const preview = cleanContent.substring(0, 150) + (cleanContent.length > 150 ? '...' : '');
                     
                     html += `
                         <div class="story-card">
@@ -724,8 +725,8 @@
                                 ${preview}
                             </div>
                             <div class="story-full" id="full-${storyId}">
-                                ${story.content}
-                                <div class="story-source">
+                            ${story.content.replace(/\\n\\n/g, '<br><br>').replace(/\\n/g, '<br>')}
+                            <div class="story-source">
                                     <strong>Source:</strong> ${story.source_url}
                                 </div>
                             </div>
