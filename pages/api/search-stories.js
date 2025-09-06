@@ -7,6 +7,34 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/**
+ * Calculate cosine similarity between two vectors
+ */
+function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length');
+  }
+
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i];
+    normA += vectorA[i] * vectorA[i];
+    normB += vectorB[i] * vectorB[i];
+  }
+
+  normA = Math.sqrt(normA);
+  normB = Math.sqrt(normB);
+
+  if (normA === 0 || normB === 0) {
+    return 0;
+  }
+
+  return dotProduct / (normA * normB);
+}
+
 // Practice suggestions by topic
 const practicesByTopic = {
   work: [
@@ -180,38 +208,45 @@ export default async function handler(req, res) {
 
     const questionEmbedding = embedding.data[0].embedding;
 
-    // Calculate similarity with stories
+    // Calculate similarity using embeddings
     const scoredStories = stories.map(story => {
-      const searchText = `${story.content} ${story.life_situations} ${story.emotions} ${story.themes}`.toLowerCase();
-      const queryTerms = cleanedQuestion.toLowerCase().split(' ');
-      
-      let score = 0;
-      queryTerms.forEach(term => {
-        if (searchText.includes(term)) {
-          score += 1;
-        }
-      });
-      
-      // Topic boost
-      if (story.life_situations.toLowerCase().includes(topic.toLowerCase()) ||
-          story.themes.toLowerCase().includes(topic.toLowerCase())) {
-        score += 2;
+      if (!story.embedding) {
+        console.warn(`Story ${story.id} missing embedding, skipping`);
+        return { ...story, similarity: 0 };
       }
-
+      
+      const similarity = cosineSimilarity(questionEmbedding, story.embedding);
+      
       return {
         ...story,
-        similarity: score / queryTerms.length
+        similarity: similarity
       };
     });
 
-    // Filter and sort by similarity
+    // Filter by similarity threshold and sort
+    const SIMILARITY_THRESHOLD = 0.50;
     const relevantStories = scoredStories
-      .filter(story => story.similarity > 0.1)
+      .filter(story => story.similarity >= SIMILARITY_THRESHOLD)
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, 3);
 
+    // Enhanced debugging
+    console.log('=== EMBEDDING SIMILARITY DEBUG ===');
+    console.log(`Query: "${cleanedQuestion}" (Topic: ${topic})`);
+    console.log('Top 10 similarity scores:');
+    scoredStories
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 10)
+      .forEach((story, i) => {
+        console.log(`${i+1}. "${story.title}" - Score: ${story.similarity.toFixed(3)}`);
+      });
+    console.log('===============================');
+
     // If no relevant stories found, return fallback
     if (relevantStories.length === 0) {
+      const bestScore = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity || 0;
+      console.log(`No stories above ${SIMILARITY_THRESHOLD} threshold. Best score: ${bestScore.toFixed(3)}`);
+      
       return res.status(200).json({
         fallback: true,
         message: "Sorry, we don't have any stories matching your situation right now. Try sharing a few words (like 'job loss', 'illness', 'faith').",
@@ -240,4 +275,4 @@ export default async function handler(req, res) {
     console.error('Search error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-}
+}// Updated for embedding similarity
