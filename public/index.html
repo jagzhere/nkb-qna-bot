@@ -656,7 +656,20 @@
 
                 const data = await response.json();
 
-                document.getElementById('loadingState').style.display = 'none';
+// Permanent debugging - log API response and similarity scores
+console.log('=== API RESPONSE DEBUG ===');
+console.log('Full API Response:', data);
+if (data.stories && data.stories.length > 0) {
+    console.log('Story Similarity Scores:');
+    data.stories.forEach((story, i) => {
+        console.log(`${i+1}. "${story.title}" - Similarity: ${story.similarity ? story.similarity.toFixed(3) : 'N/A'}`);
+    });
+} else {
+    console.log('No stories returned');
+}
+console.log('========================');
+
+document.getElementById('loadingState').style.display = 'none';
 
                 if (response.status === 429) {
                     // Rate limit exceeded
