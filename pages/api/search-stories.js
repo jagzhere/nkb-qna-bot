@@ -1,11 +1,29 @@
 import { OpenAI } from 'openai';
-import stories from '../../data/stories.json';
+import fs from 'fs';
+import zlib from 'zlib';
+import path from 'path';
 import { checkRateLimit } from '../../utils/rateLimit';
 import { detectBot } from '../../utils/botDetection';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Load and decompress stories
+let stories;
+try {
+  const compressedPath = path.join(process.cwd(), 'data', 'stories-with-embeddings.json.gz');
+  const compressedData = fs.readFileSync(compressedPath);
+  const decompressedData = zlib.gunzipSync(compressedData);
+  stories = JSON.parse(decompressedData.toString());
+  console.log(`Loaded ${stories.length} stories with embeddings from compressed file`);
+} catch (error) {
+  console.error('Error loading compressed stories:', error);
+  // Fallback to regular stories if compressed file fails
+  const fallbackStories = await import('../../data/stories.json');
+  stories = fallbackStories.default;
+  console.log(`Fallback: Loaded ${stories.length} stories without embeddings`);
+}
 
 /**
  * Calculate cosine similarity between two vectors
@@ -275,4 +293,5 @@ export default async function handler(req, res) {
     console.error('Search error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-}// Updated for embedding similarity
+}
+// Updated for embedding similarity
