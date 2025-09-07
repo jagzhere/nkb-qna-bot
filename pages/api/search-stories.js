@@ -290,15 +290,16 @@ async function generateCombinedLessons(stories, question, topic, language) {
       max_tokens: 150
     });
     
-    let lessonsText = response.choices[0].message.content.trim();
-    
-    // Try to parse as JSON array, fallback to text processing
-    let lessons;
-    try {
-      lessons = JSON.parse(lessonsText);
-    } catch {
-      // Fallback: split by quotes and filter
-      lessons = lessonsText.split('"').filter(l => l.length > 20 && !l.includes('[') && !l.includes(']'));
+    let lessonsResponse = response.choices[0].message.content.trim();
+
+// Try to parse as JSON array, fallback to text processing
+let lessons;
+try {
+  lessons = JSON.parse(lessonsResponse);
+} catch {
+  // Fallback: split by quotes and filter
+  lessons = lessonsResponse.split('"').filter(l => l.length > 20 && !l.includes('[') && !l.includes(']'));
+}
     }
     
     // Ensure we have 2-3 lessons
