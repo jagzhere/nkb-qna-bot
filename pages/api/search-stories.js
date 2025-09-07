@@ -476,7 +476,7 @@ export default async function handler(req, res) {
     });
 
     // Filter by similarity threshold and sort
-    const SIMILARITY_THRESHOLD = 0.30;
+    const SIMILARITY_THRESHOLD = 0.27;
     const relevantStories = scoredStories
       .filter(story => story.similarity >= SIMILARITY_THRESHOLD)
       .sort((a, b) => b.similarity - a.similarity)
