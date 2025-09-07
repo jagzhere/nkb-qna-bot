@@ -53,6 +53,33 @@ function cosineSimilarity(vectorA, vectorB) {
   return dotProduct / (normA * normB);
 }
 
+// Translation helper
+async function translateText(text, targetLanguage) {
+  if (targetLanguage === 'english') return text;
+  
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a translator specializing in spiritual and devotional content. Translate the given text to Hindi while preserving the spiritual essence and emotional tone. Keep any references to 'Ram', 'Maharaj-ji', 'Neem Karoli Baba' in their original forms."
+        },
+        {
+          role: "user",
+          content: `Translate to Hindi: ${text}`
+        }
+      ],
+      temperature: 0.3,
+    });
+    
+    return response.choices[0].message.content.trim();
+  } catch (error) {
+    console.error('Translation error:', error);
+    return text; // Fallback to original text
+  }
+}
+
 // Practice suggestions by topic
 const practicesByTopic = {
   work: [
@@ -86,15 +113,6 @@ const practicesByTopic = {
     "Fold your hands, bow your head, and whisper 'Thank you Maharaj-ji.'"
   ]
 };
-
-// Empathy responses
-const empathyResponses = [
-  "I'm sorry you're going through this. Let's look at what the sources say and find some guidance.",
-  "It sounds like you're facing a difficult time. Here are some stories from fellow devotees who've walked similar paths.",
-  "Your heart is heavy right now. Let these stories remind you that you're not alone in this journey.",
-  "I understand this feels overwhelming. Here's what other devotees have shared about similar experiences.",
-  "This must be challenging for you. Let's see what wisdom these stories might offer."
-];
 
 // Reflection questions by topic
 const reflectionQuestions = {
@@ -173,6 +191,16 @@ const gratitudePrompts = [
   "Thank Maharaj-ji for bringing you exactly what you need, when you need it"
 ];
 
+// Topic-specific keyword suggestions for fallback
+const keywordSuggestions = {
+  work: ["job loss", "career change", "money stress", "work pressure", "unemployment"],
+  relationships: ["family conflict", "marriage problems", "daughter", "son", "parent issues"],
+  health: ["illness", "pain", "healing", "medical worry", "body weakness"],
+  grief: ["death", "loss", "mourning", "missing someone", "goodbye"],
+  faith: ["doubt", "prayer", "spiritual dryness", "questioning beliefs", "connection"],
+  other: ["life direction", "purpose", "confusion", "seeking guidance", "lost"]
+};
+
 function getRandomFromArray(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -187,6 +215,183 @@ function generateCommunityElement(storyCount) {
   return getRandomFromArray(messages);
 }
 
+// Generate dynamic empathy based on question content
+async function generateDynamicEmpathy(question, topic, language) {
+  try {
+    const prompt = `Generate a single, compassionate empathy line (max 20 words) for someone asking: "${question}" (topic: ${topic}). Be warm and acknowledge their specific situation. Don't use generic phrases.`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a compassionate spiritual counselor. Generate brief, specific empathy responses that acknowledge the person's exact situation."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 50
+    });
+    
+    let empathy = response.choices[0].message.content.trim().replace(/['"]/g, '');
+    
+    // Translate if needed
+    if (language === 'hindi') {
+      empathy = await translateText(empathy, 'hindi');
+    }
+    
+    return empathy;
+  } catch (error) {
+    console.error('Error generating empathy:', error);
+    // Fallback empathy responses
+    const fallbacks = [
+      "I understand you're going through a difficult time.",
+      "Your heart is heavy right now, and that's completely understandable.",
+      "This sounds really challenging for you."
+    ];
+    return getRandomFromArray(fallbacks);
+  }
+}
+
+// Generate combined lessons from stories
+async function generateCombinedLessons(stories, question, topic, language) {
+  try {
+    const storyLessons = stories.map(story => story.lessons || []).flat();
+    const lessonsText = storyLessons.join('. ');
+    
+    const prompt = `Based on these story lessons: "${lessonsText}"
+    
+    Generate 2-3 specific takeaways for someone asking: "${question}" (topic: ${topic})
+    
+    Format as an array of strings. Each takeaway should:
+    - Connect the story lessons to their specific situation
+    - Be practical and actionable
+    - Feel personal and relevant
+    - Be 15-25 words each
+    
+    Example format: ["First specific takeaway...", "Second relevant point...", "Third practical insight..."]`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a wise spiritual counselor. Create personalized, practical lessons that connect ancient wisdom to modern problems."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.6,
+      max_tokens: 150
+    });
+    
+    let lessonsText = response.choices[0].message.content.trim();
+    
+    // Try to parse as JSON array, fallback to text processing
+    let lessons;
+    try {
+      lessons = JSON.parse(lessonsText);
+    } catch {
+      // Fallback: split by quotes and filter
+      lessons = lessonsText.split('"').filter(l => l.length > 20 && !l.includes('[') && !l.includes(']'));
+    }
+    
+    // Ensure we have 2-3 lessons
+    if (!Array.isArray(lessons) || lessons.length === 0) {
+      lessons = [
+        "These stories suggest that divine guidance often comes in unexpected ways",
+        "Trust that your current challenges are preparing you for something meaningful",
+        "Remember that countless devotees have found strength in similar circumstances"
+      ];
+    }
+    
+    lessons = lessons.slice(0, 3); // Limit to 3 lessons
+    
+    // Translate if needed
+    if (language === 'hindi') {
+      const translatedLessons = await Promise.all(
+        lessons.map(lesson => translateText(lesson, 'hindi'))
+      );
+      return translatedLessons;
+    }
+    
+    return lessons;
+    
+  } catch (error) {
+    console.error('Error generating combined lessons:', error);
+    // Fallback lessons
+    return [
+      "These stories remind us that challenges often lead to unexpected growth",
+      "Divine guidance frequently appears when we least expect it",
+      "Your current struggle is preparing you for greater understanding"
+    ];
+  }
+}
+
+// Generate relevance preview for top story
+async function generateRelevancePreview(story, question, language) {
+  try {
+    const prompt = `Why is this story relevant to someone asking "${question}"? Generate a one-line relevance preview (10-15 words) starting with "This story speaks to" or "This story shows how"`;
+    
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system", 
+          content: "Generate brief relevance previews that help devotees understand why a story was chosen for their question."
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 30
+    });
+    
+    let relevance = response.choices[0].message.content.trim();
+    
+    // Translate if needed
+    if (language === 'hindi') {
+      relevance = await translateText(relevance, 'hindi');
+    }
+    
+    return relevance;
+  } catch (error) {
+    console.error('Error generating relevance:', error);
+    return null; // Don't show relevance if generation fails
+  }
+}
+
+// Generate smart keyword suggestions based on actual story content
+function generateSmartKeywords(topic, stories) {
+  // Extract keywords from stories with good content in this topic
+  const topicStories = stories.filter(story => {
+    const content = (story.life_situations || []).concat(story.emotions || []).concat(story.themes || []);
+    return content.some(item => item.toLowerCase().includes(topic.toLowerCase()));
+  });
+  
+  // If we have topic-specific stories, extract their keywords
+  if (topicStories.length > 0) {
+    const allKeywords = topicStories
+      .flatMap(story => (story.life_situations || []).concat(story.emotions || []))
+      .filter(keyword => keyword.length > 3)
+      .slice(0, 5);
+    
+    if (allKeywords.length > 0) {
+      return allKeywords;
+    }
+  }
+  
+  // Fallback to predefined keywords
+  return keywordSuggestions[topic] || keywordSuggestions.other;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -198,7 +403,7 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const { question, topic, fingerprint } = req.body;
+    const { question, topic, fingerprint, language = 'english' } = req.body;
 
     if (!question || !topic || !fingerprint) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -207,8 +412,12 @@ export default async function handler(req, res) {
     // Rate limiting
     const rateLimitResult = checkRateLimit(fingerprint, req.ip);
     if (!rateLimitResult.allowed) {
+      const limitMessage = language === 'hindi' ? 
+        'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
+        'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
       return res.status(429).json({ 
         error: 'rate_limit',
+        message: limitMessage,
         remaining: 0 
       });
     }
@@ -218,10 +427,35 @@ export default async function handler(req, res) {
       .replace(/^(ram\s+ram|ram|baba|maharaj-?ji|maharaj)\s*/gi, '')
       .trim();
 
+    // For Hindi questions, translate to English for processing
+    let questionForProcessing = cleanedQuestion;
+    if (language === 'hindi') {
+      try {
+        const translationResponse = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: "Translate the following Hindi text to English, preserving the meaning and context."
+            },
+            {
+              role: "user",
+              content: cleanedQuestion
+            }
+          ],
+          temperature: 0.3,
+        });
+        questionForProcessing = translationResponse.choices[0].message.content.trim();
+      } catch (error) {
+        console.error('Translation error for question:', error);
+        // Continue with original question if translation fails
+      }
+    }
+
     // Create embedding for the question
     const embedding = await openai.embeddings.create({
       model: "text-embedding-3-large",
-      input: `${cleanedQuestion} ${topic}`,
+      input: `${questionForProcessing} ${topic}`,
     });
 
     const questionEmbedding = embedding.data[0].embedding;
@@ -250,7 +484,7 @@ export default async function handler(req, res) {
 
     // Enhanced debugging
     console.log('=== EMBEDDING SIMILARITY DEBUG ===');
-    console.log(`Query: "${cleanedQuestion}" (Topic: ${topic})`);
+    console.log(`Query: "${cleanedQuestion}" (Topic: ${topic}, Language: ${language})`);
     console.log('Top 10 similarity scores:');
     scoredStories
       .sort((a, b) => b.similarity - a.similarity)
@@ -260,30 +494,79 @@ export default async function handler(req, res) {
       });
     console.log('===============================');
 
-    // If no relevant stories found, return fallback
+    // If no relevant stories found, return smart fallback
     if (relevantStories.length === 0) {
       const bestScore = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity || 0;
       console.log(`No stories above ${SIMILARITY_THRESHOLD} threshold. Best score: ${bestScore.toFixed(3)}`);
       
+      const smartKeywords = generateSmartKeywords(topic, stories);
+      const keywordList = smartKeywords.slice(0, 4).map(k => `'${k}'`).join(', ');
+      
+      let fallbackMessage = `Sorry, we don't have any stories matching your situation right now. Try keywords like: ${keywordList}`;
+      
+      // Translate fallback message if needed
+      if (language === 'hindi') {
+        fallbackMessage = await translateText(fallbackMessage, 'hindi');
+      }
+      
       return res.status(200).json({
         fallback: true,
-        message: "Sorry, we don't have any stories matching your situation right now. Try sharing a few words (like 'job loss', 'illness', 'faith').",
+        message: fallbackMessage,
         remaining: rateLimitResult.remaining
       });
     }
 
+    // Generate dynamic empathy
+    const empathy = await generateDynamicEmpathy(cleanedQuestion, topic, language);
+
+    // Generate combined lessons
+    const lessons = await generateCombinedLessons(relevantStories, cleanedQuestion, topic, language);
+
+    // Generate relevance preview for top story only
+    const topStory = relevantStories[0];
+    const relevancePreview = await generateRelevancePreview(topStory, cleanedQuestion, language);
+
+    // Prepare stories with relevance preview for top story
+    const storiesWithRelevance = relevantStories.map((story, index) => ({
+      ...story,
+      source_url: story.source_url || "Miracle of Love, Ram Dass",
+      relevance: index === 0 ? relevancePreview : null // Only top story gets relevance
+    }));
+
+    // Generate other response elements
+    let reflection = getRandomFromArray(reflectionQuestions[topic] || reflectionQuestions.other);
+    let community = generateCommunityElement(relevantStories.length);
+    let practice = getRandomFromArray(practicesByTopic[topic] || practicesByTopic.other);
+    let nextSteps = getRandomFromArray(gentleNextSteps[topic] || gentleNextSteps.other);
+    let gratitude = getRandomFromArray(gratitudePrompts);
+
+    // Translate response elements if needed
+    if (language === 'hindi') {
+      [reflection, community, practice, nextSteps, gratitude] = await Promise.all([
+        translateText(reflection, 'hindi'),
+        translateText(community, 'hindi'),
+        translateText(practice, 'hindi'),
+        translateText(nextSteps, 'hindi'),
+        translateText(gratitude, 'hindi')
+      ]);
+
+      // Translate story titles and content
+      for (let story of storiesWithRelevance) {
+        story.title = await translateText(story.title, 'hindi');
+        story.content = await translateText(story.content, 'hindi');
+      }
+    }
+
     // Generate full response structure
     const response = {
-      empathy: getRandomFromArray(empathyResponses),
-      stories: relevantStories.map(story => ({
-        ...story,
-        source_url: story.source_url || "Miracle of Love, Ram Dass"
-      })),
-      reflection: getRandomFromArray(reflectionQuestions[topic] || reflectionQuestions.other),
-      community: generateCommunityElement(relevantStories.length),
-      practice: getRandomFromArray(practicesByTopic[topic] || practicesByTopic.other),
-      nextSteps: getRandomFromArray(gentleNextSteps[topic] || gentleNextSteps.other),
-      gratitude: getRandomFromArray(gratitudePrompts),
+      empathy,
+      stories: storiesWithRelevance,
+      lessons, // New combined lessons section
+      reflection,
+      community,
+      practice,
+      nextSteps,
+      gratitude,
       remaining: rateLimitResult.remaining
     };
 
@@ -294,4 +577,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
-// Updated for embedding similarity
