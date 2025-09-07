@@ -300,7 +300,6 @@ try {
   // Fallback: split by quotes and filter
   lessons = lessonsResponse.split('"').filter(l => l.length > 20 && !l.includes('[') && !l.includes(']'));
 }
-    }
     
     // Ensure we have 2-3 lessons
     if (!Array.isArray(lessons) || lessons.length === 0) {
