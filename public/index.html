@@ -44,6 +44,45 @@
             font-style: italic;
         }
 
+        /* Language Toggle */
+        .language-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .language-toggle label {
+            font-weight: 600;
+            margin-right: 15px;
+            color: #7A0019;
+        }
+
+        .language-buttons {
+            display: inline-flex;
+            border: 2px solid #FF6A00;
+            border-radius: 25px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .language-btn {
+            padding: 8px 20px;
+            border: none;
+            background: white;
+            color: #FF6A00;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .language-btn.active {
+            background: #FF6A00;
+            color: white;
+        }
+
+        .language-btn:hover:not(.active) {
+            background: #fff5f0;
+        }
+
         /* Navigation Cards */
         .nav-cards {
             display: flex;
@@ -114,40 +153,7 @@
             font-size: 1.5rem;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .question-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e8e8e8;
-            border-radius: 8px;
-            font-size: 1rem;
-            resize: vertical;
-            min-height: 100px;
-            transition: border-color 0.3s ease;
-        }
-
-        .question-input:focus {
-            outline: none;
-            border-color: #FF6A00;
-        }
-
-        .word-count {
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        /* Topic Selection */
+        /* Topic Selection - Now at top */
         .topic-section {
             margin-bottom: 25px;
         }
@@ -180,6 +186,39 @@
         .topic-option label {
             cursor: pointer;
             font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e8e8e8;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s ease;
+        }
+
+        .question-input:focus {
+            outline: none;
+            border-color: #FF6A00;
+        }
+
+        .word-count {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 5px;
         }
 
         /* Ask Button */
@@ -293,6 +332,15 @@
             font-size: 1.1rem;
         }
 
+        .story-relevance {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            padding-left: 10px;
+            border-left: 3px solid #FF6A00;
+        }
+
         .story-preview {
             color: #666;
             line-height: 1.6;
@@ -328,6 +376,26 @@
 
         .read-more-btn:hover {
             background: #5a0013;
+        }
+
+        .lessons-section {
+            background: #fff8f0;
+            border-left: 4px solid #FF6A00;
+        }
+
+        .lessons-section h4 {
+            color: #FF6A00;
+            margin-bottom: 15px;
+        }
+
+        .lessons-section ul {
+            margin-left: 20px;
+        }
+
+        .lessons-section li {
+            margin-bottom: 10px;
+            color: #555;
+            line-height: 1.6;
         }
 
         .reflection-section {
@@ -485,15 +553,24 @@
             <p>You AREN'T Alone</p>
         </div>
 
+        <!-- Language Toggle -->
+        <div class="language-toggle">
+            <label>Choose your language:</label>
+            <div class="language-buttons">
+                <button class="language-btn active" id="englishBtn" onclick="setLanguage('english')">English</button>
+                <button class="language-btn" id="hindiBtn" onclick="setLanguage('hindi')">हिंदी</button>
+            </div>
+        </div>
+
         <!-- Navigation Cards -->
         <div class="nav-cards">
             <a href="/daily-darshan.html" class="nav-card daily-darshan">
-                <h3>🙏 Daily Darshan</h3>
-                <p>Connect with Maharaj-ji daily</p>
+                <h3 id="navDarshan">🙏 Daily Darshan</h3>
+                <p id="navDarshanDesc">Connect with Maharaj-ji daily</p>
             </a>
             <a href="/guided-meditation.html" class="nav-card guided-meditation">
-                <h3>🧘 Guided Meditation</h3>
-                <p>Ram Ram meditation practice</p>
+                <h3 id="navMeditation">🧘 Guided Meditation</h3>
+                <p id="navMeditationDesc">Ram Ram meditation practice</p>
             </a>
         </div>
 
@@ -501,8 +578,38 @@
         <div class="main-content">
             <!-- Ask Section -->
             <div class="ask-section">
-                <h2>What's in your heart</h2>
+                <h2 id="askSectionTitle">What's in your heart</h2>
                 
+                <div class="topic-section">
+                    <label id="topicLabel"><strong>Topic (helps us find relevant stories)</strong></label>
+                    <div class="topic-grid">
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="work" id="work">
+                            <label for="work" id="topicWork">Work/Finances</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="relationships" id="relationships">
+                            <label for="relationships" id="topicRelationships">Relationships/Family</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="health" id="health">
+                            <label for="health" id="topicHealth">Health/Body</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="grief" id="grief">
+                            <label for="grief" id="topicGrief">Grief/Loss</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="faith" id="faith">
+                            <label for="faith" id="topicFaith">Faith/Practice</label>
+                        </div>
+                        <div class="topic-option">
+                            <input type="radio" name="topic" value="other" id="other">
+                            <label for="other" id="topicOther">Other</label>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="input-group">
                     <textarea 
                         class="question-input" 
@@ -513,51 +620,21 @@
                     <div class="word-count" id="wordCount">0/25 words (auto-truncated)</div>
                 </div>
 
-                <div class="topic-section">
-                    <label><strong>Topic (helps us find relevant stories)</strong></label>
-                    <div class="topic-grid">
-                        <div class="topic-option">
-                            <input type="radio" name="topic" value="work" id="work">
-                            <label for="work">Work/Finances</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="radio" name="topic" value="relationships" id="relationships">
-                            <label for="relationships">Relationships/Family</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="radio" name="topic" value="health" id="health">
-                            <label for="health">Health/Body</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="radio" name="topic" value="grief" id="grief">
-                            <label for="grief">Grief/Loss</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="radio" name="topic" value="faith" id="faith">
-                            <label for="faith">Faith/Practice</label>
-                        </div>
-                        <div class="topic-option">
-                            <input type="radio" name="topic" value="other" id="other">
-                            <label for="other">Other</label>
-                        </div>
-                    </div>
-                </div>
-
                 <button class="ask-button" id="askButton">Ask</button>
             </div>
 
             <!-- Results Section -->
             <div class="results-section">
-                <h2>Stories for You</h2>
+                <h2 id="resultsSectionTitle">Stories for You</h2>
                 
                 <div class="welcome-message" id="welcomeMessage">
                     <span class="emoji">🙏</span>
-                    <p>Ask your question and discover stories from fellow devotees who've walked similar paths.</p>
+                    <p id="welcomeText">Ask your question and discover stories from fellow devotees who've walked similar paths.</p>
                 </div>
 
                 <div class="loading" id="loadingState" style="display: none;">
                     <div class="spinner"></div>
-                    <p>🙏 Maharajji is listening...</p>
+                    <p id="loadingText">🙏 Maharajji is listening...</p>
                 </div>
 
                 <div id="resultsContent" style="display: none;">
@@ -567,7 +644,7 @@
                 <div class="fallback-message" id="fallbackMessage" style="display: none;">
                     <span class="emoji">🙏</span>
                     <p id="fallbackText"></p>
-                    <button class="try-again-btn" onclick="resetForm()">Ask differently</button>
+                    <button class="try-again-btn" onclick="resetForm()" id="tryAgainBtn">Ask differently</button>
                 </div>
             </div>
         </div>
@@ -576,6 +653,65 @@
     <script>
         let currentFingerprint = null;
         let loadedStoryCount = 0;
+        let currentLanguage = 'english';
+
+        // Translation object
+        const translations = {
+            english: {
+                navDarshan: "🙏 Daily Darshan",
+                navDarshanDesc: "Connect with Maharaj-ji daily",
+                navMeditation: "🧘 Guided Meditation",
+                navMeditationDesc: "Ram Ram meditation practice",
+                askSectionTitle: "What's in your heart",
+                topicLabel: "Topic (helps us find relevant stories)",
+                topicWork: "Work/Finances",
+                topicRelationships: "Relationships/Family",
+                topicHealth: "Health/Body",
+                topicGrief: "Grief/Loss",
+                topicFaith: "Faith/Practice",
+                topicOther: "Other",
+                resultsSectionTitle: "Stories for You",
+                welcomeText: "Ask your question and discover stories from fellow devotees who've walked similar paths.",
+                loadingText: "🙏 Maharajji is listening...",
+                askButton: "Ask",
+                tryAgainBtn: "Ask differently",
+                placeholders: {
+                    work: "e.g., 'Lost my job and feel hopeless' or 'Struggling financially'",
+                    relationships: "e.g., 'My daughter won't talk to me' or 'Marriage feels distant'",
+                    health: "e.g., 'Dealing with chronic illness' or 'Body feels weak'",
+                    grief: "e.g., 'Lost my mother recently' or 'Grieving a relationship'",
+                    faith: "e.g., 'Questioning my beliefs' or 'Can't feel God's presence'",
+                    other: "e.g., 'Feeling lost in life' or 'Need spiritual guidance'"
+                }
+            },
+            hindi: {
+                navDarshan: "🙏 दैनिक दर्शन",
+                navDarshanDesc: "महाराज जी से रोज़ाना जुड़ें",
+                navMeditation: "🧘 निर्देशित ध्यान",
+                navMeditationDesc: "राम राम ध्यान अभ्यास",
+                askSectionTitle: "आपके दिल में क्या है",
+                topicLabel: "विषय (प्रासंगिक कहानियां खोजने में मदद करता है)",
+                topicWork: "काम/वित्त",
+                topicRelationships: "रिश्ते/परिवार",
+                topicHealth: "स्वास्थ्य/शरीर",
+                topicGrief: "दुख/हानि",
+                topicFaith: "श्रद्धा/अभ्यास",
+                topicOther: "अन्य",
+                resultsSectionTitle: "आपके लिए कहानियां",
+                welcomeText: "अपना प्रश्न पूछें और उन साथी भक्तों की कहानियां खोजें जिन्होंने समान रास्ते तय किए हैं।",
+                loadingText: "🙏 महाराज जी सुन रहे हैं...",
+                askButton: "पूछें",
+                tryAgainBtn: "अलग तरीके से पूछें",
+                placeholders: {
+                    work: "उदा., 'नौकरी खो गई और निराश हूं' या 'आर्थिक परेशानी'",
+                    relationships: "उदा., 'मेरी बेटी मुझसे बात नहीं करती' या 'शादी में दूरी'",
+                    health: "उदा., 'पुरानी बीमारी से जूझ रहा हूं' या 'शरीर कमजोर लगता है'",
+                    grief: "उदा., 'मां को हाल ही में खोया' या 'रिश्ते का दुख'",
+                    faith: "उदा., 'अपनी मान्यताओं पर सवाल' या 'भगवान की उपस्थिति महसूस नहीं'",
+                    other: "उदा., 'जीवन में खोया महसूस' या 'आध्यात्मिक मार्गदर्शन चाहिए'"
+                }
+            }
+        };
 
         // Generate browser fingerprint
         function generateFingerprint() {
@@ -594,9 +730,54 @@
             return btoa(fingerprint).substring(0, 32);
         }
 
+        // Set language function
+        function setLanguage(language) {
+            currentLanguage = language;
+            
+            // Update button states
+            document.getElementById('englishBtn').classList.toggle('active', language === 'english');
+            document.getElementById('hindiBtn').classList.toggle('active', language === 'hindi');
+            
+            // Update UI text
+            const t = translations[language];
+            Object.keys(t).forEach(key => {
+                if (key !== 'placeholders') {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        element.textContent = t[key];
+                    }
+                }
+            });
+            
+            // Update placeholder based on selected topic
+            updatePlaceholder();
+        }
+
+        // Update placeholder based on topic selection
+        function updatePlaceholder() {
+            const selectedTopic = document.querySelector('input[name="topic"]:checked');
+            const questionInput = document.getElementById('questionInput');
+            
+            if (selectedTopic) {
+                const topicValue = selectedTopic.value;
+                const placeholder = translations[currentLanguage].placeholders[topicValue];
+                questionInput.placeholder = placeholder;
+            } else {
+                const defaultPlaceholder = currentLanguage === 'hindi' ? 
+                    'जो आपको परेशान कर रहा है उसे साझा करें...' : 
+                    'Share what\'s troubling you...';
+                questionInput.placeholder = defaultPlaceholder;
+            }
+        }
+
         // Initialize fingerprint on page load
         document.addEventListener('DOMContentLoaded', function() {
             currentFingerprint = generateFingerprint();
+            
+            // Add topic selection listeners
+            document.querySelectorAll('input[name="topic"]').forEach(radio => {
+                radio.addEventListener('change', updatePlaceholder);
+            });
         });
 
         // Word count functionality
@@ -609,13 +790,16 @@
             const words = text === '' ? [] : text.split(/\s+/);
             const wordLength = words.length;
             
+            const countText = currentLanguage === 'hindi' ? 
+                'शब्द (स्वतः-छंटे गए)' : 'words (auto-truncated)';
+            
             if (wordLength > 25) {
                 const truncated = words.slice(0, 25).join(' ');
                 this.value = truncated;
-                wordCount.textContent = '25/25 words (auto-truncated)';
+                wordCount.textContent = `25/25 ${countText}`;
                 wordCount.style.color = '#FF6A00';
             } else {
-                wordCount.textContent = `${wordLength}/25 words (auto-truncated)`;
+                wordCount.textContent = `${wordLength}/25 ${countText}`;
                 wordCount.style.color = '#888';
             }
         });
@@ -625,13 +809,20 @@
             const question = questionInput.value.trim();
             const selectedTopic = document.querySelector('input[name="topic"]:checked');
             
+            const noQuestionAlert = currentLanguage === 'hindi' ? 
+                'कृपया पहले अपने दिल की बात साझा करें' : 
+                'Please share what\'s in your heart first';
+            const noTopicAlert = currentLanguage === 'hindi' ? 
+                'कृपया प्रासंगिक कहानियां खोजने के लिए एक विषय चुनें' : 
+                'Please select a topic to help us find relevant stories';
+            
             if (!question) {
-                alert('Please share what\'s in your heart first');
+                alert(noQuestionAlert);
                 return;
             }
             
             if (!selectedTopic) {
-                alert('Please select a topic to help us find relevant stories');
+                alert(noTopicAlert);
                 return;
             }
 
@@ -650,31 +841,35 @@
                     body: JSON.stringify({
                         question: question,
                         topic: selectedTopic.value,
-                        fingerprint: currentFingerprint
+                        fingerprint: currentFingerprint,
+                        language: currentLanguage
                     })
                 });
 
                 const data = await response.json();
 
-// Permanent debugging - log API response and similarity scores
-console.log('=== API RESPONSE DEBUG ===');
-console.log('Full API Response:', data);
-if (data.stories && data.stories.length > 0) {
-    console.log('Story Similarity Scores:');
-    data.stories.forEach((story, i) => {
-        console.log(`${i+1}. "${story.title}" - Similarity: ${story.similarity ? story.similarity.toFixed(3) : 'N/A'}`);
-    });
-} else {
-    console.log('No stories returned');
-}
-console.log('========================');
+                // Permanent debugging - log API response and similarity scores
+                console.log('=== API RESPONSE DEBUG ===');
+                console.log('Full API Response:', data);
+                if (data.stories && data.stories.length > 0) {
+                    console.log('Story Similarity Scores:');
+                    data.stories.forEach((story, i) => {
+                        console.log(`${i+1}. "${story.title}" - Similarity: ${story.similarity ? story.similarity.toFixed(3) : 'N/A'}`);
+                    });
+                } else {
+                    console.log('No stories returned');
+                }
+                console.log('========================');
 
-document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('loadingState').style.display = 'none';
 
                 if (response.status === 429) {
                     // Rate limit exceeded
+                    const limitMessage = currentLanguage === 'hindi' ? 
+                        'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
+                        'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
                     document.getElementById('fallbackMessage').style.display = 'block';
-                    document.getElementById('fallbackText').textContent = 'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
+                    document.getElementById('fallbackText').textContent = limitMessage;
                     return;
                 }
 
@@ -700,7 +895,10 @@ document.getElementById('loadingState').style.display = 'none';
                 console.error('Error:', error);
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('fallbackMessage').style.display = 'block';
-                document.getElementById('fallbackText').textContent = 'Something went wrong. Please try again.';
+                const errorMessage = currentLanguage === 'hindi' ? 
+                    'कुछ गलत हुआ। कृपया फिर कोशिश करें।' :
+                    'Something went wrong. Please try again.';
+                document.getElementById('fallbackText').textContent = errorMessage;
             }
         });
 
@@ -721,30 +919,35 @@ document.getElementById('loadingState').style.display = 'none';
 
             // 2. What the sources say
             if (data.stories && data.stories.length > 0) {
+                const sourcesTitle = currentLanguage === 'hindi' ? 'स्रोत क्या कहते हैं' : 'What the sources say';
                 html += `
                     <div class="response-section stories-section">
-                        <h3>What the sources say</h3>
+                        <h3>${sourcesTitle}</h3>
                 `;
 
                 data.stories.forEach((story, index) => {
                     const storyId = `story-${index}`;
                     const cleanContent = story.content.replace(/\\n\\n/g, ' ').replace(/\\n/g, ' ');
                     const preview = cleanContent.substring(0, 150) + (cleanContent.length > 150 ? '...' : '');
+                    const readMoreText = currentLanguage === 'hindi' ? 'और पढ़ें' : 'Read more';
+                    const showLessText = currentLanguage === 'hindi' ? 'कम दिखाएं' : 'Show less';
+                    const sourceText = currentLanguage === 'hindi' ? 'स्रोत:' : 'Source:';
                     
                     html += `
                         <div class="story-card">
                             <h4>${story.title}</h4>
+                            ${story.relevance ? `<div class="story-relevance">${story.relevance}</div>` : ''}
                             <div class="story-preview" id="preview-${storyId}">
                                 ${preview}
                             </div>
                             <div class="story-full" id="full-${storyId}">
-                            ${story.content.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}
-                            <div class="story-source">
-                                    <strong>Source:</strong> ${story.source_url}
+                                ${story.content.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}
+                                <div class="story-source">
+                                    <strong>${sourceText}</strong> ${story.source_url}
                                 </div>
                             </div>
                             <button class="read-more-btn" onclick="toggleStory('${storyId}')" id="btn-${storyId}">
-                                Read more
+                                ${readMoreText}
                             </button>
                         </div>
                     `;
@@ -753,17 +956,37 @@ document.getElementById('loadingState').style.display = 'none';
                 html += `</div>`;
             }
 
-            // 3. Reflection question
+            // 3. Combined lessons section
+            if (data.lessons && data.lessons.length > 0) {
+                const lessonsTitle = currentLanguage === 'hindi' ? 
+                    'ये कहानियां आपकी स्थिति के बारे में क्या सिखाती हैं' :
+                    'What these stories teach about your situation';
+                html += `
+                    <div class="response-section lessons-section">
+                        <h4>${lessonsTitle}</h4>
+                        <ul>
+                `;
+                data.lessons.forEach(lesson => {
+                    html += `<li>${lesson}</li>`;
+                });
+                html += `
+                        </ul>
+                    </div>
+                `;
+            }
+
+            // 4. Reflection question
             if (data.reflection) {
+                const reflectionTitle = currentLanguage === 'hindi' ? 'चिंतन' : 'Reflection';
                 html += `
                     <div class="response-section reflection-section">
-                        <h4>Reflection</h4>
+                        <h4>${reflectionTitle}</h4>
                         <p>${data.reflection}</p>
                     </div>
                 `;
             }
 
-            // 4. Community element
+            // 5. Community element
             if (data.community) {
                 html += `
                     <div class="response-section community-section">
@@ -772,27 +995,29 @@ document.getElementById('loadingState').style.display = 'none';
                 `;
             }
 
-            // 5. Practice suggestion
+            // 6. Practice suggestion
             if (data.practice) {
+                const practiceTitle = currentLanguage === 'hindi' ? 'अभ्यास' : 'Practice';
                 html += `
                     <div class="response-section practice-section">
-                        <h4>Practice</h4>
+                        <h4>${practiceTitle}</h4>
                         <p>${data.practice}</p>
                     </div>
                 `;
             }
 
-            // 6. Gentle next steps
+            // 7. Gentle next steps
             if (data.nextSteps) {
+                const nextStepsTitle = currentLanguage === 'hindi' ? 'जब आप तैयार हों' : 'When You\'re Ready';
                 html += `
                     <div class="response-section nextsteps-section">
-                        <h4>When You're Ready</h4>
+                        <h4>${nextStepsTitle}</h4>
                         <p>${data.nextSteps}</p>
                     </div>
                 `;
             }
 
-            // 7. Gratitude prompt
+            // 8. Gratitude prompt
             if (data.gratitude) {
                 html += `
                     <div class="response-section gratitude-section">
@@ -802,12 +1027,18 @@ document.getElementById('loadingState').style.display = 'none';
             }
 
             // Feedback section
+            const feedbackTitle = currentLanguage === 'hindi' ? 
+                '🙏 क्या इस उत्तर से आपको मदद मिली?' :
+                '🙏 Did this answer help you?';
+            const yesText = currentLanguage === 'hindi' ? 'हां' : 'Yes';
+            const noText = currentLanguage === 'hindi' ? 'नहीं' : 'No';
+            
             html += `
                 <div class="feedback-section">
-                    <p><strong>🙏 Did this answer help you?</strong></p>
+                    <p><strong>${feedbackTitle}</strong></p>
                     <div class="feedback-buttons">
-                        <button class="feedback-btn feedback-yes" onclick="submitFeedback('yes')">Yes</button>
-                        <button class="feedback-btn feedback-no" onclick="submitFeedback('no')">No</button>
+                        <button class="feedback-btn feedback-yes" onclick="submitFeedback('yes')">${yesText}</button>
+                        <button class="feedback-btn feedback-no" onclick="submitFeedback('no')">${noText}</button>
                     </div>
                 </div>
             `;
@@ -821,15 +1052,17 @@ document.getElementById('loadingState').style.display = 'none';
             const preview = document.getElementById(`preview-${storyId}`);
             const full = document.getElementById(`full-${storyId}`);
             const btn = document.getElementById(`btn-${storyId}`);
+            const readMoreText = currentLanguage === 'hindi' ? 'और पढ़ें' : 'Read more';
+            const showLessText = currentLanguage === 'hindi' ? 'कम दिखाएं' : 'Show less';
 
             if (full.style.display === 'none' || full.style.display === '') {
                 preview.style.display = 'none';
                 full.style.display = 'block';
-                btn.textContent = 'Show less';
+                btn.textContent = showLessText;
             } else {
                 preview.style.display = 'block';
                 full.style.display = 'none';
-                btn.textContent = 'Read more';
+                btn.textContent = readMoreText;
             }
         }
 
@@ -840,13 +1073,18 @@ document.getElementById('loadingState').style.display = 'none';
             
             // Show thank you message
             const buttons = document.querySelector('.feedback-buttons');
-            buttons.innerHTML = '<p style="color: #4CAF50; margin-top: 10px;">Thank you for your feedback! 🙏</p>';
+            const thankYouMessage = currentLanguage === 'hindi' ? 
+                'आपके फीडबैक के लिए धन्यवाद! 🙏' :
+                'Thank you for your feedback! 🙏';
+            buttons.innerHTML = `<p style="color: #4CAF50; margin-top: 10px;">${thankYouMessage}</p>`;
         }
 
         // Reset form
         function resetForm() {
             document.getElementById('questionInput').value = '';
-            document.getElementById('wordCount').textContent = '0/25 words (auto-truncated)';
+            const countText = currentLanguage === 'hindi' ? 
+                'शब्द (स्वतः-छंटे गए)' : 'words (auto-truncated)';
+            document.getElementById('wordCount').textContent = `0/25 ${countText}`;
             document.querySelectorAll('input[name="topic"]').forEach(radio => radio.checked = false);
             
             document.getElementById('welcomeMessage').style.display = 'block';
@@ -855,6 +1093,7 @@ document.getElementById('loadingState').style.display = 'none';
             document.getElementById('fallbackMessage').style.display = 'none';
             
             loadedStoryCount = 0;
+            updatePlaceholder(); // Reset placeholder
         }
     </script>
 </body>
