@@ -372,15 +372,26 @@ async function generateRelevancePreview(story, question, language) {
 function generateSmartKeywords(topic, stories) {
   // Extract keywords from stories with good content in this topic
   const topicStories = stories.filter(story => {
-    const content = (story.life_situations || []).concat(story.emotions || []).concat(story.themes || []);
-    return content.some(item => item.toLowerCase().includes(topic.toLowerCase()));
+    // Ensure all fields are arrays before processing
+    const lifeSituations = Array.isArray(story.life_situations) ? story.life_situations : [];
+    const emotions = Array.isArray(story.emotions) ? story.emotions : [];
+    const themes = Array.isArray(story.themes) ? story.themes : [];
+    
+    const content = lifeSituations.concat(emotions).concat(themes);
+    return content.some(item => 
+      typeof item === 'string' && item.toLowerCase().includes(topic.toLowerCase())
+    );
   });
   
   // If we have topic-specific stories, extract their keywords
   if (topicStories.length > 0) {
     const allKeywords = topicStories
-      .flatMap(story => (story.life_situations || []).concat(story.emotions || []))
-      .filter(keyword => keyword.length > 3)
+      .flatMap(story => {
+        const lifeSituations = Array.isArray(story.life_situations) ? story.life_situations : [];
+        const emotions = Array.isArray(story.emotions) ? story.emotions : [];
+        return lifeSituations.concat(emotions);
+      })
+      .filter(keyword => typeof keyword === 'string' && keyword.length > 3)
       .slice(0, 5);
     
     if (allKeywords.length > 0) {
