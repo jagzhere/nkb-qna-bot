@@ -655,6 +655,96 @@
         let loadedStoryCount = 0;
         let currentLanguage = 'english';
 
+        // Analytics Integration
+        let currentSessionId = null;
+        let sessionStartTime = new Date();
+
+        // Generate session ID
+        function generateSessionId() {
+            return `${currentFingerprint}-${Date.now()}`;
+        }
+
+        // Track page view
+        async function trackPageView(page = window.location.pathname, referrer = document.referrer) {
+            if (!currentSessionId) {
+                currentSessionId = generateSessionId();
+            }
+            
+            try {
+                await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'page_view',
+                        fingerprint: currentFingerprint,
+                        sessionId: currentSessionId,
+                        page,
+                        referrer,
+                        userAgent: navigator.userAgent,
+                        language: currentLanguage
+                    })
+                });
+            } catch (error) {
+                console.log('Analytics tracking failed:', error);
+            }
+        }
+
+        // Track feature usage
+        async function trackFeatureUsage(feature, action = 'use') {
+            try {
+                await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'feature_usage',
+                        fingerprint: currentFingerprint,
+                        sessionId: currentSessionId,
+                        feature,
+                        action,
+                        language: currentLanguage
+                    })
+                });
+            } catch (error) {
+                console.log('Feature tracking failed:', error);
+            }
+        }
+
+        // Track rate limit hits
+        async function trackRateLimitHit() {
+            try {
+                await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'rate_limit_hit',
+                        fingerprint: currentFingerprint,
+                        sessionId: currentSessionId
+                    })
+                });
+            } catch (error) {
+                console.log('Rate limit tracking failed:', error);
+            }
+        }
+
+        // Track session end
+        async function trackSessionEnd() {
+            if (currentSessionId) {
+                try {
+                    await fetch('/api/analytics', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'session_end',
+                            fingerprint: currentFingerprint,
+                            sessionId: currentSessionId
+                        })
+                    });
+                } catch (error) {
+                    console.log('Session end tracking failed:', error);
+                }
+            }
+        }
+
         // Translation object
         const translations = {
             english: {
@@ -770,13 +860,33 @@
             }
         }
 
-        // Initialize fingerprint on page load
+        // Initialize analytics and fingerprint on page load
         document.addEventListener('DOMContentLoaded', function() {
             currentFingerprint = generateFingerprint();
+            
+            // Track initial page view
+            trackPageView();
             
             // Add topic selection listeners
             document.querySelectorAll('input[name="topic"]').forEach(radio => {
                 radio.addEventListener('change', updatePlaceholder);
+            });
+
+            // Track navigation card clicks
+            document.querySelectorAll('.nav-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const feature = this.href.includes('daily-darshan') ? 'daily-darshan' : 'guided-meditation';
+                    trackFeatureUsage(feature, 'navigate');
+                });
+            });
+            
+            // Track language toggle
+            document.getElementById('englishBtn')?.addEventListener('click', function() {
+                trackFeatureUsage('language-toggle', 'english');
+            });
+            
+            document.getElementById('hindiBtn')?.addEventListener('click', function() {
+                trackFeatureUsage('language-toggle', 'hindi');
             });
         });
 
@@ -865,6 +975,7 @@
 
                 if (response.status === 429) {
                     // Rate limit exceeded
+                    trackRateLimitHit();
                     const limitMessage = currentLanguage === 'hindi' ? 
                         'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
                         'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
@@ -1059,17 +1170,35 @@
                 preview.style.display = 'none';
                 full.style.display = 'block';
                 btn.textContent = showLessText;
+                trackFeatureUsage('story-expansion', 'expand');
             } else {
                 preview.style.display = 'block';
                 full.style.display = 'none';
                 btn.textContent = readMoreText;
+                trackFeatureUsage('story-expansion', 'collapse');
             }
         }
 
         // Submit feedback
-        function submitFeedback(feedback) {
-            // Here you would send feedback to your analytics API
+        async function submitFeedback(feedback) {
             console.log('Feedback:', feedback);
+            
+            // Track feedback analytics
+            try {
+                await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'feedback',
+                        fingerprint: currentFingerprint,
+                        sessionId: currentSessionId,
+                        helpful: feedback === 'yes',
+                        language: currentLanguage
+                    })
+                });
+            } catch (error) {
+                console.log('Feedback tracking failed:', error);
+            }
             
             // Show thank you message
             const buttons = document.querySelector('.feedback-buttons');
@@ -1095,6 +1224,26 @@
             loadedStoryCount = 0;
             updatePlaceholder(); // Reset placeholder
         }
+
+        // Track session end on page unload
+        window.addEventListener('beforeunload', function() {
+            trackSessionEnd();
+        });
+
+        // Track visibility changes (user switching tabs)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                trackSessionEnd();
+            } else {
+                // User returned to tab - track as new session if enough time passed
+                const timeSinceStart = new Date() - sessionStartTime;
+                if (timeSinceStart > 30 * 60 * 1000) { // 30 minutes
+                    currentSessionId = generateSessionId();
+                    sessionStartTime = new Date();
+                    trackPageView();
+                }
+            }
+        });
     </script>
 </body>
 </html>

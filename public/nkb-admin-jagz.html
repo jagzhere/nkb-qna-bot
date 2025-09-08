@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NKB Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef9e7 0%, #fdf2e9 100%);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #7A0019;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #FF6A00;
+        }
+        .metric-card h3 {
+            margin: 0 0 10px 0;
+            color: #7A0019;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FF6A00;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 10px;
+        }
+        .section h2 {
+            color: #7A0019;
+            margin-bottom: 15px;
+        }
+        .topic-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .topic-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #4CAF50;
+        }
+        .refresh-btn {
+            background: #FF6A00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background: #e55a00;
+        }
+        .loading {
+            text-align: center;
+            color: #FF6A00;
+            font-style: italic;
+        }
+        .error {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .freemium-insights {
+            background: linear-gradient(135deg, #e8f5e8, #f0fff0);
+            border-left: 4px solid #4CAF50;
+        }
+        .conversion-metric {
+            display: inline-block;
+            background: white;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            border-left: 3px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 NKB Analytics Dashboard</h1>
+        
+        <button class="refresh-btn" onclick="loadAllData()">🔄 Refresh Data</button>
+        
+        <div id="loading" class="loading" style="display: none;">Loading analytics data...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <!-- Key Metrics -->
+        <div class="metric-grid" id="keyMetrics">
+            <!-- Populated by JavaScript -->
+        </div>
+        
+        <!-- Freemium Insights -->
+        <div class="section freemium-insights" id="freemiumSection">
+            <h2>💰 Freemium Conversion Insights</h2>
+            <div id="freemiumData">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Topic Breakdown -->
+        <div class="section">
+            <h2>📈 Question Topics</h2>
+            <div class="topic-breakdown" id="topicData">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Feature Usage -->
+        <div class="section">
+            <h2>🎯 Feature Usage</h2>
+            <div id="featureData">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="section">
+            <h2>⏰ Recent Activity</h2>
+            <div id="recentActivity">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple password protection
+        function checkAccess() {
+            const correctPassword = 'maharajji2025';
+            const enteredPassword = prompt('Enter dashboard password:');
+            
+            if (enteredPassword !== correctPassword) {
+                document.body.innerHTML = '<div style="text-align: center; padding: 50px;"><h1>Access Denied</h1><p>Invalid credentials</p></div>';
+                return false;
+            }
+            return true;
+        }
+
+        // Load general analytics
+        async function loadGeneralStats() {
+            try {
+                const response = await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_stats' })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayGeneralStats(data);
+            } catch (error) {
+                showError('Failed to load general stats: ' + error.message);
+            }
+        }
+
+        // Load freemium insights
+        async function loadFreemiumInsights() {
+            try {
+                const response = await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_freemium_insights' })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                displayFreemiumInsights(data);
+            } catch (error) {
+                showError('Failed to load freemium insights: ' + error.message);
+            }
+        }
+
+        // Display general statistics
+        function displayGeneralStats(data) {
+            // Key metrics
+            const keyMetrics = document.getElementById('keyMetrics');
+            keyMetrics.innerHTML = `
+                <div class="metric-card">
+                    <h3>Total Users</h3>
+                    <div class="metric-value">${data.summary?.totalUsers || 0}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Total Questions</h3>
+                    <div class="metric-value">${data.summary?.totalQuestions || 0}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Total Sessions</h3>
+                    <div class="metric-value">${data.summary?.totalSessions || 0}</div>
+                </div>
+                <div class="metric-card">
+                    <h3>Rate Limit Hits</h3>
+                    <div class="metric-value">${data.summary?.rateLimitHits || 0}</div>
+                </div>
+            `;
+
+            // Topic breakdown
+            const topicData = document.getElementById('topicData');
+            if (data.topicBreakdown && Object.keys(data.topicBreakdown).length > 0) {
+                topicData.innerHTML = Object.entries(data.topicBreakdown)
+                    .map(([topic, count]) => `
+                        <div class="topic-item">
+                            <h4>${topic}</h4>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #4CAF50;">${count}</div>
+                        </div>
+                    `).join('');
+            } else {
+                topicData.innerHTML = '<p>No topic data available yet.</p>';
+            }
+
+            // Feature usage
+            const featureData = document.getElementById('featureData');
+            if (data.featureStats && Object.keys(data.featureStats).length > 0) {
+                featureData.innerHTML = Object.entries(data.featureStats)
+                    .map(([feature, stats]) => `
+                        <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 5px;">
+                            <strong>${feature}</strong>: ${stats.views} views (${stats.uniqueUsers} unique users)
+                        </div>
+                    `).join('');
+            } else {
+                featureData.innerHTML = '<p>No feature usage data available yet.</p>';
+            }
+
+            // User segments
+            if (data.userSegments) {
+                const recentActivity = document.getElementById('recentActivity');
+                recentActivity.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h4>New Users</h4>
+                            <div style="font-size: 1.5rem; color: #2196F3;">${data.userSegments.new}</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h4>Returning Users</h4>
+                            <div style="font-size: 1.5rem; color: #FF9800;">${data.userSegments.returning}</div>
+                        </div>
+                        <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                            <h4>Power Users</h4>
+                            <div style="font-size: 1.5rem; color: #4CAF50;">${data.userSegments.power}</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Display freemium insights
+        function displayFreemiumInsights(data) {
+            const freemiumData = document.getElementById('freemiumData');
+            
+            if (data.conversionReadiness) {
+                const cr = data.conversionReadiness;
+                freemiumData.innerHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <h3>Conversion Readiness Metrics</h3>
+                        <div class="conversion-metric">
+                            <strong>Power User %:</strong> ${cr.powerUserPercentage?.toFixed(1) || 0}%
+                        </div>
+                        <div class="conversion-metric">
+                            <strong>Return Rate:</strong> ${cr.returnRate?.toFixed(1) || 0}%
+                        </div>
+                        <div class="conversion-metric">
+                            <strong>Avg Questions/User:</strong> ${cr.averageQuestionsPerUser?.toFixed(1) || 0}
+                        </div>
+                        <div class="conversion-metric">
+                            <strong>Rate Limit Hitters:</strong> ${data.userValueSignals?.rateLimitHitters || 0}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3>Feature Adoption</h3>
+                        ${Object.entries(data.featurePopularity || {})
+                            .map(([feature, stats]) => `
+                                <div style="margin: 5px 0; padding: 8px; background: rgba(255,255,255,0.7); border-radius: 4px;">
+                                    <strong>${feature}:</strong> ${stats.usage} uses (${stats.adoption?.toFixed(1) || 0}% adoption)
+                                </div>
+                            `).join('')
+                        }
+                    </div>
+                `;
+            } else {
+                freemiumData.innerHTML = '<p>Freemium insights will appear once you have user data.</p>';
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Hide error message
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        // Load all data
+        async function loadAllData() {
+            hideError();
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                await Promise.all([
+                    loadGeneralStats(),
+                    loadFreemiumInsights()
+                ]);
+            } catch (error) {
+                showError('Failed to load dashboard data');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAccess()) {
+                loadAllData();
+                
+                // Auto-refresh every 5 minutes
+                setInterval(loadAllData, 5 * 60 * 1000);
+            }
+        });
+    </script>
+</body>
+</html>

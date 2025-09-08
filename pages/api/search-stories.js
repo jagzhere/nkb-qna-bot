@@ -421,17 +421,31 @@ export default async function handler(req, res) {
     }
 
     // Rate limiting
-    const rateLimitResult = checkRateLimit(fingerprint, req.ip);
-    if (!rateLimitResult.allowed) {
-      const limitMessage = language === 'hindi' ? 
-        'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
-        'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
-      return res.status(429).json({ 
-        error: 'rate_limit',
-        message: limitMessage,
-        remaining: 0 
-      });
-    }
+const rateLimitResult = checkRateLimit(fingerprint, req.ip);
+if (!rateLimitResult.allowed) {
+  // Track rate limit hit
+  try {
+    await fetch(`${req.headers.origin || 'https://nkb-qna-bot.vercel.app'}/api/analytics`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'rate_limit_hit',
+        fingerprint
+      })
+    });
+  } catch (error) {
+    console.log('Rate limit tracking failed:', error);
+  }
+  
+  const limitMessage = language === 'hindi' ? 
+    'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
+    'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
+  return res.status(429).json({ 
+    error: 'rate_limit',
+    message: limitMessage,
+    remaining: 0 
+  });
+}
 
     // Clean question (remove salutations)
     const cleanedQuestion = question
@@ -581,7 +595,26 @@ export default async function handler(req, res) {
       remaining: rateLimitResult.remaining
     };
 
-    res.status(200).json(response);
+      // Track question analytics
+try {
+  await fetch(`${req.headers.origin || 'https://nkb-qna-bot.vercel.app'}/api/analytics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'question_asked',
+      fingerprint,
+      topic,
+      questionLength: cleanedQuestion.length,
+      language,
+      hasResults: relevantStories.length > 0,
+      similarityScore: relevantStories[0]?.similarity || null
+    })
+  });
+} catch (error) {
+  console.log('Question tracking failed:', error);
+}
+
+res.status(200).json(response);
 
   } catch (error) {
     console.error('Search error:', error);
