@@ -10,7 +10,7 @@ export function checkRateLimit(fingerprint, ip) {
   const ipCount = limits.get(ipKey) || 0;
   
   // Block if either fingerprint OR IP has exceeded limit
-  if (fingerprintCount >= 20 || ipCount >= 20) {
+  if (fingerprintCount >= 3 || ipCount >= 3) {
     return { 
       allowed: false, 
       remaining: 0 
@@ -27,6 +27,6 @@ export function checkRateLimit(fingerprint, ip) {
   
   return { 
     allowed: true, 
-    remaining: Math.min(20 - newFingerprintCount, 20 - newIpCount)
+    remaining: Math.min(3 - newFingerprintCount, 3 - newIpCount)
   };
 }
