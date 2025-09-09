@@ -481,6 +481,7 @@ try {
       fingerprint,
       topic,
       language,
+      questionText: cleanedQuestion,
       hasResults: true, // Will update this later based on results
       similarityScore: null // Will update this later
     })

@@ -52,6 +52,20 @@ export default async function handler(req, res) {
           });
           break;
 
+        case 'question_asked':
+  // Track question
+  analyticsData.users.add(fingerprint);
+  analyticsData.questions.push({
+    timestamp,
+    fingerprint,
+    topic: data.topic,
+    questionText: data.questionText, // ADD THIS LINE
+    language: data.language || 'english',
+    hasResults: data.hasResults !== false,
+    similarityScore: data.similarityScore
+  });
+  break;
+
         case 'rate_limit_hit':
           analyticsData.rateLimitHits++;
           break;
@@ -131,6 +145,12 @@ export default async function handler(req, res) {
               { uses: data.count, uniqueUsers: data.users.size }
             ])
           )
+         recentQuestions: analyticsData.questions.slice(-10).map(q => ({
+          question: q.questionText,
+          topic: q.topic,
+          hasResults: q.hasResults,
+          timestamp: q.timestamp
+          }))
         };
 
         console.log('Returning stats:', stats);
