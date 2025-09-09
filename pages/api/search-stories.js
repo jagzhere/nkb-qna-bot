@@ -544,7 +544,8 @@ export default async function handler(req, res) {
       const bestScore = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity || 0;
       console.log(`No stories above ${SIMILARITY_THRESHOLD} threshold. Best score: ${bestScore.toFixed(3)}`);
       
-      // Track failed question search
+      // Track failed question search with debug
+      console.log('=== ABOUT TO TRACK QUESTION (NO STORIES) ===');
       await trackAnalytics('question_asked', {
         fingerprint,
         topic,
@@ -554,6 +555,7 @@ export default async function handler(req, res) {
         hasResults: false,
         similarityScore: bestScore
       }, req);
+      console.log('=== QUESTION TRACKING COMPLETED (NO STORIES) ===');
       
       const smartKeywords = generateSmartKeywords(topic, stories);
       const keywordList = smartKeywords.slice(0, 4).map(k => `'${k}'`).join(', ');
@@ -614,6 +616,7 @@ export default async function handler(req, res) {
     }
 
     // Track successful question search BEFORE generating response
+    console.log('=== ABOUT TO TRACK QUESTION ===');
     await trackAnalytics('question_asked', {
       fingerprint,
       topic,
@@ -623,6 +626,7 @@ export default async function handler(req, res) {
       hasResults: true,
       similarityScore: relevantStories[0]?.similarity || null
     }, req);
+    console.log('=== QUESTION TRACKING COMPLETED ===');
 
     // Generate full response structure
     const response = {
