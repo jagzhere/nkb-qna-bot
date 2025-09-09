@@ -144,7 +144,7 @@ export default async function handler(req, res) {
               name, 
               { uses: data.count, uniqueUsers: data.users.size }
             ])
-          )
+          ),
          recentQuestions: analyticsData.questions.slice(-10).map(q => ({
           question: q.questionText,
           topic: q.topic,
