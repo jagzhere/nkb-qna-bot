@@ -446,6 +446,7 @@ function generateSmartKeywords(topic, stories) {
 }
 
 export default async function handler(req, res) {
+  console.log('HANDLER EXECUTING AT', Date.now());
   console.log('🔥 SEARCH-STORIES FILE UPDATED - NEW VERSION DEPLOYED 🔥');
   
   if (req.method !== 'POST') {
