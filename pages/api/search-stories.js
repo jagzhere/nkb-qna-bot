@@ -53,6 +53,35 @@ function cosineSimilarity(vectorA, vectorB) {
   return dotProduct / (normA * normB);
 }
 
+// Analytics tracking helper - FIXED VERSION
+async function trackAnalytics(action, data) {
+  try {
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+    
+    const response = await fetch(`${baseUrl}/api/analytics`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action,
+        timestamp: new Date().toISOString(),
+        ...data
+      })
+    });
+    
+    if (!response.ok) {
+      console.error(`Analytics ${action} failed:`, response.status, response.statusText);
+    } else {
+      console.log(`Analytics ${action} tracked successfully`);
+    }
+  } catch (error) {
+    console.error(`Analytics ${action} error:`, error.message);
+  }
+}
+
 // Translation helper
 async function translateText(text, targetLanguage) {
   if (targetLanguage === 'english') return text;
@@ -292,14 +321,14 @@ async function generateCombinedLessons(stories, question, topic, language) {
     
     let lessonsResponse = response.choices[0].message.content.trim();
 
-// Try to parse as JSON array, fallback to text processing
-let lessons;
-try {
-  lessons = JSON.parse(lessonsResponse);
-} catch {
-  // Fallback: split by quotes and filter
-  lessons = lessonsResponse.split('"').filter(l => l.length > 20 && !l.includes('[') && !l.includes(']'));
-}
+    // Try to parse as JSON array, fallback to text processing
+    let lessons;
+    try {
+      lessons = JSON.parse(lessonsResponse);
+    } catch {
+      // Fallback: split by quotes and filter
+      lessons = lessonsResponse.split('"').filter(l => l.length > 20 && !l.includes('[') && !l.includes(']'));
+    }
     
     // Ensure we have 2-3 lessons
     if (!Array.isArray(lessons) || lessons.length === 0) {
@@ -421,31 +450,22 @@ export default async function handler(req, res) {
     }
 
     // Rate limiting
-const rateLimitResult = checkRateLimit(fingerprint, req.ip);
-if (!rateLimitResult.allowed) {
-  // Track rate limit hit
-  try {
-    await fetch(`${req.headers.origin || 'https://nkb-qna-bot.vercel.app'}/api/analytics`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'rate_limit_hit',
+    const rateLimitResult = checkRateLimit(fingerprint, req.ip);
+    if (!rateLimitResult.allowed) {
+      // Track rate limit hit - FIXED
+      await trackAnalytics('rate_limit_hit', {
         fingerprint
-      })
-    });
-  } catch (error) {
-    console.log('Rate limit tracking failed:', error);
-  }
-  
-  const limitMessage = language === 'hindi' ? 
-    'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
-    'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
-  return res.status(429).json({ 
-    error: 'rate_limit',
-    message: limitMessage,
-    remaining: 0 
-  });
-}
+      });
+      
+      const limitMessage = language === 'hindi' ? 
+        'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
+        'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
+      return res.status(429).json({ 
+        error: 'rate_limit',
+        message: limitMessage,
+        remaining: 0 
+      });
+    }
 
     // Clean question (remove salutations)
     const cleanedQuestion = question
@@ -518,6 +538,16 @@ if (!rateLimitResult.allowed) {
         console.log(`${i+1}. "${story.title}" - Score: ${story.similarity.toFixed(3)}`);
       });
     console.log('===============================');
+
+    // Track question analytics - FIXED
+    await trackAnalytics('question_asked', {
+      fingerprint,
+      topic,
+      questionLength: cleanedQuestion.length,
+      language,
+      hasResults: relevantStories.length > 0,
+      similarityScore: relevantStories[0]?.similarity || null
+    });
 
     // If no relevant stories found, return smart fallback
     if (relevantStories.length === 0) {
@@ -595,26 +625,7 @@ if (!rateLimitResult.allowed) {
       remaining: rateLimitResult.remaining
     };
 
-      // Track question analytics
-try {
-  await fetch(`${req.headers.origin || 'https://nkb-qna-bot.vercel.app'}/api/analytics`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'question_asked',
-      fingerprint,
-      topic,
-      questionLength: cleanedQuestion.length,
-      language,
-      hasResults: relevantStories.length > 0,
-      similarityScore: relevantStories[0]?.similarity || null
-    })
-  });
-} catch (error) {
-  console.log('Question tracking failed:', error);
-}
-
-res.status(200).json(response);
+    res.status(200).json(response);
 
   } catch (error) {
     console.error('Search error:', error);

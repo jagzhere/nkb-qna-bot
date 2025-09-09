@@ -565,11 +565,11 @@
         <!-- Navigation Cards -->
         <div class="nav-cards">
             <a href="/daily-darshan.html" class="nav-card daily-darshan">
-                <h3 id="navDarshan">🙏 Daily Darshan</h3>
+                <h3 id="navDarshan">Daily Darshan</h3>
                 <p id="navDarshanDesc">Connect with Maharaj-ji daily</p>
             </a>
             <a href="/guided-meditation.html" class="nav-card guided-meditation">
-                <h3 id="navMeditation">🧘 Guided Meditation</h3>
+                <h3 id="navMeditation">Guided Meditation</h3>
                 <p id="navMeditationDesc">Ram Ram meditation practice</p>
             </a>
         </div>
@@ -634,7 +634,7 @@
 
                 <div class="loading" id="loadingState" style="display: none;">
                     <div class="spinner"></div>
-                    <p id="loadingText">🙏 Maharajji is listening...</p>
+                    <p id="loadingText">Maharajji is listening...</p>
                 </div>
 
                 <div id="resultsContent" style="display: none;">
@@ -655,7 +655,7 @@
         let loadedStoryCount = 0;
         let currentLanguage = 'english';
 
-        // Analytics Integration
+        // Analytics Integration - ENHANCED
         let currentSessionId = null;
         let sessionStartTime = new Date();
 
@@ -664,93 +664,57 @@
             return `${currentFingerprint}-${Date.now()}`;
         }
 
+        // FIXED: Track analytics with proper error handling
+        async function trackAnalytics(action, data = {}) {
+            try {
+                console.log(`Tracking analytics: ${action}`, data);
+                const response = await fetch('/api/analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action,
+                        fingerprint: currentFingerprint,
+                        sessionId: currentSessionId,
+                        timestamp: new Date().toISOString(),
+                        ...data
+                    })
+                });
+                
+                if (response.ok) {
+                    console.log(`Analytics ${action} tracked successfully`);
+                } else {
+                    console.error(`Analytics ${action} failed:`, response.status);
+                }
+            } catch (error) {
+                console.log(`Analytics ${action} failed:`, error);
+            }
+        }
+
         // Track page view
         async function trackPageView(page = window.location.pathname, referrer = document.referrer) {
-            if (!currentSessionId) {
-                currentSessionId = generateSessionId();
-            }
-            
-            try {
-                await fetch('/api/analytics', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'page_view',
-                        fingerprint: currentFingerprint,
-                        sessionId: currentSessionId,
-                        page,
-                        referrer,
-                        userAgent: navigator.userAgent,
-                        language: currentLanguage
-                    })
-                });
-            } catch (error) {
-                console.log('Analytics tracking failed:', error);
-            }
+            await trackAnalytics('page_view', {
+                page,
+                referrer,
+                userAgent: navigator.userAgent,
+                language: currentLanguage
+            });
         }
 
-        // Track feature usage
+        // Track feature usage with specific actions
         async function trackFeatureUsage(feature, action = 'use') {
-            try {
-                await fetch('/api/analytics', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'feature_usage',
-                        fingerprint: currentFingerprint,
-                        sessionId: currentSessionId,
-                        feature,
-                        action,
-                        language: currentLanguage
-                    })
-                });
-            } catch (error) {
-                console.log('Feature tracking failed:', error);
-            }
-        }
-
-        // Track rate limit hits
-        async function trackRateLimitHit() {
-            try {
-                await fetch('/api/analytics', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'rate_limit_hit',
-                        fingerprint: currentFingerprint,
-                        sessionId: currentSessionId
-                    })
-                });
-            } catch (error) {
-                console.log('Rate limit tracking failed:', error);
-            }
-        }
-
-        // Track session end
-        async function trackSessionEnd() {
-            if (currentSessionId) {
-                try {
-                    await fetch('/api/analytics', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'session_end',
-                            fingerprint: currentFingerprint,
-                            sessionId: currentSessionId
-                        })
-                    });
-                } catch (error) {
-                    console.log('Session end tracking failed:', error);
-                }
-            }
+            await trackAnalytics('feature_usage', {
+                feature,
+                action,
+                language: currentLanguage
+            });
         }
 
         // Translation object
         const translations = {
             english: {
-                navDarshan: "🙏 Daily Darshan",
+                navDarshan: "Daily Darshan",
                 navDarshanDesc: "Connect with Maharaj-ji daily",
-                navMeditation: "🧘 Guided Meditation",
+                navMeditation: "Guided Meditation",
                 navMeditationDesc: "Ram Ram meditation practice",
                 askSectionTitle: "What's in your heart",
                 topicLabel: "Topic (helps us find relevant stories)",
@@ -762,7 +726,7 @@
                 topicOther: "Other",
                 resultsSectionTitle: "Stories for You",
                 welcomeText: "Ask your question and discover stories from fellow devotees who've walked similar paths.",
-                loadingText: "🙏 Maharajji is listening...",
+                loadingText: "Maharajji is listening...",
                 askButton: "Ask",
                 tryAgainBtn: "Ask differently",
                 placeholders: {
@@ -775,9 +739,9 @@
                 }
             },
             hindi: {
-                navDarshan: "🙏 दैनिक दर्शन",
+                navDarshan: "दैनिक दर्शन",
                 navDarshanDesc: "महाराज जी से रोज़ाना जुड़ें",
-                navMeditation: "🧘 निर्देशित ध्यान",
+                navMeditation: "निर्देशित ध्यान",
                 navMeditationDesc: "राम राम ध्यान अभ्यास",
                 askSectionTitle: "आपके दिल में क्या है",
                 topicLabel: "विषय (प्रासंगिक कहानियां खोजने में मदद करता है)",
@@ -789,7 +753,7 @@
                 topicOther: "अन्य",
                 resultsSectionTitle: "आपके लिए कहानियां",
                 welcomeText: "अपना प्रश्न पूछें और उन साथी भक्तों की कहानियां खोजें जिन्होंने समान रास्ते तय किए हैं।",
-                loadingText: "🙏 महाराज जी सुन रहे हैं...",
+                loadingText: "महाराज जी सुन रहे हैं...",
                 askButton: "पूछें",
                 tryAgainBtn: "अलग तरीके से पूछें",
                 placeholders: {
@@ -823,6 +787,9 @@
         // Set language function
         function setLanguage(language) {
             currentLanguage = language;
+            
+            // Track language toggle
+            trackFeatureUsage('language-toggle', language);
             
             // Update button states
             document.getElementById('englishBtn').classList.toggle('active', language === 'english');
@@ -861,32 +828,29 @@
         }
 
         // Initialize analytics and fingerprint on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             currentFingerprint = generateFingerprint();
+            currentSessionId = generateSessionId();
+            
+            console.log('Initializing analytics with fingerprint:', currentFingerprint);
             
             // Track initial page view
-            trackPageView();
+            await trackPageView();
             
             // Add topic selection listeners
             document.querySelectorAll('input[name="topic"]').forEach(radio => {
-                radio.addEventListener('change', updatePlaceholder);
+                radio.addEventListener('change', function() {
+                    updatePlaceholder();
+                    trackFeatureUsage('topic-selection', this.value);
+                });
             });
 
             // Track navigation card clicks
             document.querySelectorAll('.nav-card').forEach(card => {
-                card.addEventListener('click', function() {
+                card.addEventListener('click', function(e) {
                     const feature = this.href.includes('daily-darshan') ? 'daily-darshan' : 'guided-meditation';
-                    trackFeatureUsage(feature, 'navigate');
+                    trackFeatureUsage('navigation', feature);
                 });
-            });
-            
-            // Track language toggle
-            document.getElementById('englishBtn')?.addEventListener('click', function() {
-                trackFeatureUsage('language-toggle', 'english');
-            });
-            
-            document.getElementById('hindiBtn')?.addEventListener('click', function() {
-                trackFeatureUsage('language-toggle', 'hindi');
             });
         });
 
@@ -975,7 +939,6 @@
 
                 if (response.status === 429) {
                     // Rate limit exceeded
-                    trackRateLimitHit();
                     const limitMessage = currentLanguage === 'hindi' ? 
                         'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
                         'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
@@ -1139,8 +1102,8 @@
 
             // Feedback section
             const feedbackTitle = currentLanguage === 'hindi' ? 
-                '🙏 क्या इस उत्तर से आपको मदद मिली?' :
-                '🙏 Did this answer help you?';
+                'क्या इस उत्तर से आपको मदद मिली?' :
+                'Did this answer help you?';
             const yesText = currentLanguage === 'hindi' ? 'हां' : 'Yes';
             const noText = currentLanguage === 'hindi' ? 'नहीं' : 'No';
             
@@ -1179,32 +1142,21 @@
             }
         }
 
-        // Submit feedback
+        // Submit feedback with enhanced tracking
         async function submitFeedback(feedback) {
             console.log('Feedback:', feedback);
             
-            // Track feedback analytics
-            try {
-                await fetch('/api/analytics', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'feedback',
-                        fingerprint: currentFingerprint,
-                        sessionId: currentSessionId,
-                        helpful: feedback === 'yes',
-                        language: currentLanguage
-                    })
-                });
-            } catch (error) {
-                console.log('Feedback tracking failed:', error);
-            }
+            // Track feedback
+            await trackAnalytics('feedback', {
+                helpful: feedback === 'yes',
+                language: currentLanguage
+            });
             
             // Show thank you message
             const buttons = document.querySelector('.feedback-buttons');
             const thankYouMessage = currentLanguage === 'hindi' ? 
-                'आपके फीडबैक के लिए धन्यवाद! 🙏' :
-                'Thank you for your feedback! 🙏';
+                'आपके फीडबैक के लिए धन्यवाद!' :
+                'Thank you for your feedback!';
             buttons.innerHTML = `<p style="color: #4CAF50; margin-top: 10px;">${thankYouMessage}</p>`;
         }
 
@@ -1225,17 +1177,17 @@
             updatePlaceholder(); // Reset placeholder
         }
 
-        // Track session end on page unload
-        window.addEventListener('beforeunload', function() {
-            trackSessionEnd();
+        // Enhanced session tracking
+        window.addEventListener('beforeunload', async function() {
+            await trackAnalytics('session_end');
         });
 
-        // Track visibility changes (user switching tabs)
+        // Track visibility changes
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                trackSessionEnd();
+                trackAnalytics('session_end');
             } else {
-                // User returned to tab - track as new session if enough time passed
+                // User returned - track as session continuation if recent
                 const timeSinceStart = new Date() - sessionStartTime;
                 if (timeSinceStart > 30 * 60 * 1000) { // 30 minutes
                     currentSessionId = generateSessionId();
