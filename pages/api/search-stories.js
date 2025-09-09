@@ -564,6 +564,7 @@ export default async function handler(req, res) {
         fallbackMessage = await translateText(fallbackMessage, 'hindi');
       }
      
+      console.log('About to track question analytics...');
       // Track question analytics - add this after rate limiting check
 try {
   const baseUrl = process.env.VERCEL_URL 
@@ -648,7 +649,8 @@ try {
       gratitude,
       remaining: rateLimitResult.remaining
     };
-
+     
+     console.log('About to track question analytics...');
      // Track question analytics - successful queries
 try {
   const baseUrl = process.env.VERCEL_URL 
