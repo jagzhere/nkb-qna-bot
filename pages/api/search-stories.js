@@ -435,6 +435,8 @@ function generateSmartKeywords(topic, stories) {
 }
 
 export default async function handler(req, res) {
+  console.log('🔥 SEARCH-STORIES FILE UPDATED - NEW VERSION DEPLOYED 🔥');
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
