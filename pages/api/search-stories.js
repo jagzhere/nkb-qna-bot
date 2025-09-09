@@ -53,16 +53,23 @@ function cosineSimilarity(vectorA, vectorB) {
   return dotProduct / (normA * normB);
 }
 
-// Analytics tracking helper - FIXED VERSION
+// Enhanced trackAnalytics function with more debugging
 async function trackAnalytics(action, data, req) {
   try {
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}`
-      : `https://${req.headers.host}`;  // FIXED: Use req.headers.host
+      : `https://${req.headers.host}`;
     
-    console.log(`Tracking analytics: ${action} to ${baseUrl}/api/analytics`);
+    const fullUrl = `${baseUrl}/api/analytics`;
     
-    const response = await fetch(`${baseUrl}/api/analytics`, {
+    console.log(`🔍 Tracking analytics: ${action} to ${fullUrl}`);
+    console.log(`🔍 Full tracking data:`, {
+      action,
+      timestamp: new Date().toISOString(),
+      ...data
+    });
+    
+    const response = await fetch(fullUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -74,13 +81,17 @@ async function trackAnalytics(action, data, req) {
       })
     });
     
+    console.log(`🔍 Response status: ${response.status} ${response.statusText}`);
+    
     if (!response.ok) {
-      console.error(`Analytics ${action} failed:`, response.status, response.statusText);
+      const errorText = await response.text();
+      console.error(`🔍 Analytics ${action} failed:`, response.status, response.statusText, errorText);
     } else {
-      console.log(`Analytics ${action} tracked successfully`);
+      const responseData = await response.json();
+      console.log(`🔍 Analytics ${action} tracked successfully:`, responseData);
     }
   } catch (error) {
-    console.error(`Analytics ${action} error:`, error.message);
+    console.error(`🔍 Analytics ${action} error:`, error.message, error.stack);
   }
 }
 
@@ -546,9 +557,9 @@ export default async function handler(req, res) {
       const bestScore = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity || 0;
       console.log(`No stories above ${SIMILARITY_THRESHOLD} threshold. Best score: ${bestScore.toFixed(3)}`);
       
-      // Track failed question search with debug
-      console.log('=== ABOUT TO TRACK QUESTION (NO STORIES) ===');
-      await trackAnalytics('question_asked', {
+      // Track failed question search with enhanced debug
+      console.log('🚨 === ABOUT TO TRACK QUESTION (NO STORIES) ===');
+      console.log('🚨 Tracking data:', {
         fingerprint,
         topic,
         questionLength: cleanedQuestion.length,
@@ -556,8 +567,24 @@ export default async function handler(req, res) {
         questionText: cleanedQuestion,
         hasResults: false,
         similarityScore: bestScore
-      }, req);
-      console.log('=== QUESTION TRACKING COMPLETED (NO STORIES) ===');
+      });
+      console.log('🚨 Request host:', req.headers.host);
+      console.log('🚨 Vercel URL:', process.env.VERCEL_URL);
+
+      try {
+        await trackAnalytics('question_asked', {
+          fingerprint,
+          topic,
+          questionLength: cleanedQuestion.length,
+          language,
+          questionText: cleanedQuestion,
+          hasResults: false,
+          similarityScore: bestScore
+        }, req);
+        console.log('🚨 === QUESTION TRACKING COMPLETED SUCCESSFULLY (NO STORIES) ===');
+      } catch (error) {
+        console.error('🚨 === QUESTION TRACKING FAILED (NO STORIES) ===', error);
+      }
       
       const smartKeywords = generateSmartKeywords(topic, stories);
       const keywordList = smartKeywords.slice(0, 4).map(k => `'${k}'`).join(', ');
@@ -617,9 +644,9 @@ export default async function handler(req, res) {
       }
     }
 
-    // Track successful question search BEFORE generating response
-    console.log('=== ABOUT TO TRACK QUESTION ===');
-    await trackAnalytics('question_asked', {
+    // Track successful question search with enhanced debug
+    console.log('🚨 === ABOUT TO TRACK QUESTION (WITH STORIES) ===');
+    console.log('🚨 Tracking data:', {
       fingerprint,
       topic,
       questionLength: cleanedQuestion.length,
@@ -627,8 +654,24 @@ export default async function handler(req, res) {
       questionText: cleanedQuestion,
       hasResults: true,
       similarityScore: relevantStories[0]?.similarity || null
-    }, req);
-    console.log('=== QUESTION TRACKING COMPLETED ===');
+    });
+    console.log('🚨 Request host:', req.headers.host);
+    console.log('🚨 Vercel URL:', process.env.VERCEL_URL);
+
+    try {
+      await trackAnalytics('question_asked', {
+        fingerprint,
+        topic,
+        questionLength: cleanedQuestion.length,
+        language,
+        questionText: cleanedQuestion,
+        hasResults: true,
+        similarityScore: relevantStories[0]?.similarity || null
+      }, req);
+      console.log('🚨 === QUESTION TRACKING COMPLETED SUCCESSFULLY (WITH STORIES) ===');
+    } catch (error) {
+      console.error('🚨 === QUESTION TRACKING FAILED (WITH STORIES) ===', error);
+    }
 
     // Generate full response structure
     const response = {
