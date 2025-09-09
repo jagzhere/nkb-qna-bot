@@ -54,11 +54,13 @@ function cosineSimilarity(vectorA, vectorB) {
 }
 
 // Analytics tracking helper - FIXED VERSION
-async function trackAnalytics(action, data) {
+async function trackAnalytics(action, data, req) {
   try {
     const baseUrl = process.env.VERCEL_URL 
       ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
+      : `https://${req.headers.host}`;  // FIXED: Use req.headers.host
+    
+    console.log(`Tracking analytics: ${action} to ${baseUrl}/api/analytics`);
     
     const response = await fetch(`${baseUrl}/api/analytics`, {
       method: 'POST',
@@ -452,10 +454,8 @@ export default async function handler(req, res) {
     // Rate limiting
     const rateLimitResult = checkRateLimit(fingerprint, req.ip);
     if (!rateLimitResult.allowed) {
-      // Track rate limit hit - FIXED
-      await trackAnalytics('rate_limit_hit', {
-        fingerprint
-      });
+      // Track rate limit hit
+      await trackAnalytics('rate_limit_hit', { fingerprint }, req);
       
       const limitMessage = language === 'hindi' ? 
         'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
@@ -539,20 +539,21 @@ export default async function handler(req, res) {
       });
     console.log('===============================');
 
-    // Track question analytics - FIXED
-    await trackAnalytics('question_asked', {
-      fingerprint,
-      topic,
-      questionLength: cleanedQuestion.length,
-      language,
-      hasResults: relevantStories.length > 0,
-      similarityScore: relevantStories[0]?.similarity || null
-    });
-
     // If no relevant stories found, return smart fallback
     if (relevantStories.length === 0) {
       const bestScore = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity || 0;
       console.log(`No stories above ${SIMILARITY_THRESHOLD} threshold. Best score: ${bestScore.toFixed(3)}`);
+      
+      // Track failed question search
+      await trackAnalytics('question_asked', {
+        fingerprint,
+        topic,
+        questionLength: cleanedQuestion.length,
+        language,
+        questionText: cleanedQuestion,
+        hasResults: false,
+        similarityScore: bestScore
+      }, req);
       
       const smartKeywords = generateSmartKeywords(topic, stories);
       const keywordList = smartKeywords.slice(0, 4).map(k => `'${k}'`).join(', ');
@@ -563,31 +564,6 @@ export default async function handler(req, res) {
       if (language === 'hindi') {
         fallbackMessage = await translateText(fallbackMessage, 'hindi');
       }
-     
-      console.log('About to track question analytics...');
-      // Track question analytics - add this after rate limiting check
-try {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : `https://${req.headers.host}`;
-  
-  await fetch(`${baseUrl}/api/analytics`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'question_asked',
-      fingerprint,
-      topic,
-      language,
-      questionText: cleanedQuestion,
-      hasResults: true, // Will update this later based on results
-      similarityScore: null // Will update this later
-    })
-  });
-  console.log('Question analytics tracked successfully');
-} catch (error) {
-  console.log('Question analytics failed:', error);
-}      
 
       return res.status(200).json({
         fallback: true,
@@ -637,6 +613,17 @@ try {
       }
     }
 
+    // Track successful question search BEFORE generating response
+    await trackAnalytics('question_asked', {
+      fingerprint,
+      topic,
+      questionLength: cleanedQuestion.length,
+      language,
+      questionText: cleanedQuestion,
+      hasResults: true,
+      similarityScore: relevantStories[0]?.similarity || null
+    }, req);
+
     // Generate full response structure
     const response = {
       empathy,
@@ -649,31 +636,6 @@ try {
       gratitude,
       remaining: rateLimitResult.remaining
     };
-     
-     console.log('About to track question analytics...');
-     // Track question analytics - successful queries
-try {
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : `https://${req.headers.host}`;
-  
-  await fetch(`${baseUrl}/api/analytics`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      action: 'question_asked',
-      fingerprint,
-      topic,
-      language,
-      questionText: cleanedQuestion,
-      hasResults: relevantStories.length > 0,
-      similarityScore: relevantStories[0]?.similarity || null
-    })
-  });
-  console.log('Question analytics tracked successfully');
-} catch (error) {
-  console.log('Question analytics failed:', error);
-}
 
     res.status(200).json(response);
 
