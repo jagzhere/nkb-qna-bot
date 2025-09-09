@@ -467,6 +467,29 @@ export default async function handler(req, res) {
       });
     }
 
+     // Track question analytics - add this after rate limiting check
+try {
+  const baseUrl = process.env.VERCEL_URL 
+    ? `https://${process.env.VERCEL_URL}`
+    : `https://${req.headers.host}`;
+  
+  await fetch(`${baseUrl}/api/analytics`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'question_asked',
+      fingerprint,
+      topic,
+      language,
+      hasResults: true, // Will update this later based on results
+      similarityScore: null // Will update this later
+    })
+  });
+  console.log('Question analytics tracked successfully');
+} catch (error) {
+  console.log('Question analytics failed:', error);
+}
+
     // Clean question (remove salutations)
     const cleanedQuestion = question
       .replace(/^(ram\s+ram|ram|baba|maharaj-?ji|maharaj)\s*/gi, '')
