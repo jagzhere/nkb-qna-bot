@@ -794,28 +794,71 @@
 }
 
             togglePractice() {
-                if (!this.isPlaying) {
-                    // Start or resume practice
-                    if (!this.startTime) {
-                        // Starting fresh
-                        this.startTime = Date.now();
-                    } else {
-                        // Resuming - adjust start time to account for pause
-                        this.startTime = Date.now() - (this.getElapsedTime() - this.pausedDuration);
-                    }
-                    
-                    this.isPlaying = true;
-                    this.isPaused = false;
-                    
-                    // Start audio with better error handling
-                    this.audio.play().then(() => {
-                    console.log('Audio started successfully');
-                    }).catch(e => {
-                    console.warn('Audio play failed:', e);
-                    this.audioStatus.textContent = '🔇 Click the Start button again to enable audio';
-                    this.audioStatus.style.background = 'rgba(255, 255, 255, 0.9)';
-                    this.audioStatus.style.color = '#7A0019';
-                    });
+    if (!this.isPlaying) {
+        // Start or resume practice
+        if (!this.startTime) {
+            // Starting fresh
+            this.startTime = Date.now();
+        } else {
+            // Resuming - adjust start time to account for pause
+            this.startTime = Date.now() - (this.getElapsedTime() - this.pausedDuration);
+        }
+        
+        this.isPlaying = true;
+        this.isPaused = false;
+        
+        // Start audio with comprehensive error handling
+        const playPromise = this.audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                // Audio started successfully
+                console.log('Audio started successfully');
+                this.audioStatus.textContent = '🎵 Audio playing - chant along with Maharaj-ji';
+                this.audioStatus.style.background = 'rgba(255, 255, 255, 0.1)';
+                this.audioStatus.style.color = 'white';
+                
+                // Update button immediately on success
+                document.getElementById('playPauseBtn').innerHTML = '⏸️ Pause';
+                
+            }).catch(e => {
+                console.warn('Audio play failed:', e);
+                this.audioStatus.textContent = '🔇 Click PAUSE then START again to enable audio';
+                this.audioStatus.style.background = 'rgba(255, 255, 255, 0.9)';
+                this.audioStatus.style.color = '#7A0019';
+                this.audioStatus.style.padding = '8px';
+                this.audioStatus.style.borderRadius = '8px';
+                this.audioStatus.style.marginTop = '5px';
+                
+                // Still update button even if audio fails
+                document.getElementById('playPauseBtn').innerHTML = '⏸️ Pause';
+            });
+        }
+        
+        // Start counting and image rotation regardless of audio
+        this.startCounting();
+        this.scheduleImageChange();
+        this.scheduleSessionComplete();
+        
+    } else {
+        // Pause practice
+        this.pausedDuration = this.getElapsedTime();
+        this.isPlaying = false;
+        this.isPaused = true;
+        
+        this.audio.pause();
+        document.getElementById('playPauseBtn').innerHTML = '▶ Resume';
+        
+        // Update audio status for pause
+        this.audioStatus.textContent = '⏸️ Practice paused - click Resume to continue';
+        this.audioStatus.style.background = 'rgba(255, 255, 255, 0.1)';
+        this.audioStatus.style.color = 'white';
+        
+        // Stop intervals
+        this.stopCounting();
+        this.clearTimeouts();
+    }
+}
                     
                     document.getElementById('playPauseBtn').innerHTML = '⏸️ Pause';
                     
