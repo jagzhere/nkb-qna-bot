@@ -509,6 +509,47 @@
             margin-top: 15px;
         }
 
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding: 30px 20px;
+            border-top: 1px solid rgba(122, 0, 25, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: #5A0013;
+        }
+
+        .instagram-link {
+            color: #FF6A00;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .instagram-link:hover {
+            color: #E55A00;
+            text-decoration: underline;
+        }
+
+        .divider {
+            color: #7A0019;
+            font-weight: bold;
+        }
+
+        .made-with {
+            color: #7A0019;
+            font-style: italic;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .main-content {
@@ -547,12 +588,21 @@
             .response-section {
                 padding: 15px;
             }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .divider {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-<!-- Navigation Cards -->
+     <!-- Navigation Cards -->
         <div class="nav-cards">
             <a href="/daily-darshan.html" class="nav-card daily-darshan">
                 <h3 id="navDarshan">Daily Darshan</h3>
@@ -567,7 +617,7 @@
                 <p id="navCounterDesc">Chant with Maharajji</p>
             </a>
         </div>
-        
+
         <!-- Header -->
         <div class="header">
             <h1>Devotees' Stories and Experiences</h1>
@@ -582,6 +632,7 @@
                 <button class="language-btn" id="hindiBtn" onclick="setLanguage('hindi')">हिंदी</button>
             </div>
         </div>
+
 
         <!-- Main Content -->
         <div class="main-content">
@@ -655,6 +706,19 @@
                     <p id="fallbackText"></p>
                     <button class="try-again-btn" onclick="resetForm()" id="tryAgainBtn">Ask differently</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <a href="https://instagram.com/omnipresent.divinity" target="_blank" class="instagram-link">
+                    📷 @omnipresent.divinity
+                </a>
+                <span class="divider">•</span>
+                <span class="made-with">
+                    Made with HTML + Javascript + Maharajji's boundless love 💚
+                </span>
             </div>
         </div>
     </div>
@@ -859,7 +923,8 @@
             // Track navigation card clicks
             document.querySelectorAll('.nav-card').forEach(card => {
                 card.addEventListener('click', function(e) {
-                    const feature = this.href.includes('daily-darshan') ? 'daily-darshan' : 'guided-meditation';
+                    const feature = this.href.includes('daily-darshan') ? 'daily-darshan' : 
+                                  this.href.includes('naam-jap-counter') ? 'naam-jap-counter' : 'guided-meditation';
                     trackFeatureUsage('navigation', feature);
                 });
             });
