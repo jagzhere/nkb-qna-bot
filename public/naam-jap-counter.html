@@ -756,29 +756,42 @@
             }
 
             startPracticeSession() {
-                if (!this.selectedSession) return;
+    if (!this.selectedSession) return;
 
-                this.targetCount = this.selectedSession.count;
-                this.currentCount = 0;
-                this.sessionDurationMs = this.selectedSession.duration * 60 * 1000; // Convert to milliseconds
-                this.startTime = null;
-                this.pausedDuration = 0;
+    // Reset all session state
+    this.targetCount = this.selectedSession.count;
+    this.currentCount = 0;
+    this.sessionDurationMs = this.selectedSession.duration * 60 * 1000;
+    this.startTime = null;
+    this.pausedDuration = 0;
+    this.isPlaying = false;
+    this.isPaused = false;
 
-                // Hide setup, show practice
-                document.getElementById('sessionSelection').style.display = 'none';
-                document.getElementById('practiceSession').classList.add('active');
+    // Reset button state to show "Start Practice"
+    document.getElementById('playPauseBtn').innerHTML = '▶ Start Practice';
 
-                // Update display
-                this.targetCountEl.textContent = this.targetCount;
-                this.updateCounterDisplay();
+    // Reset audio
+    this.audio.pause();
+    this.audio.currentTime = 0;
 
-                // Update audio status
-                const loops = Math.ceil(this.selectedSession.duration / this.AUDIO_DURATION_MINUTES);
-                this.audioStatus.textContent = `🎵 10-minute audio will loop ${loops} time${loops > 1 ? 's' : ''} for ${this.selectedSession.duration} minutes`;
+    // Hide setup, show practice
+    document.getElementById('sessionSelection').style.display = 'none';
+    document.getElementById('practiceSession').classList.add('active');
 
-                // Load first random image
-                this.loadRandomImage();
-            }
+    // Update display
+    this.targetCountEl.textContent = this.targetCount;
+    this.updateCounterDisplay();
+    this.updateProgress();
+
+    // Update audio status
+    const loops = Math.ceil(this.selectedSession.duration / this.AUDIO_DURATION_MINUTES);
+    this.audioStatus.textContent = `🎵 Ready to start - ${loops} loop${loops > 1 ? 's' : ''} of 9m52s audio for ${this.selectedSession.duration} minutes`;
+    this.audioStatus.style.background = 'rgba(255, 255, 255, 0.1)';
+    this.audioStatus.style.color = 'white';
+
+    // Load first random image
+    this.loadRandomImage();
+}
 
             togglePractice() {
                 if (!this.isPlaying) {
