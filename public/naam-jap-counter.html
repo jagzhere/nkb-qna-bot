@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guided Ram Ram Practice - NKB QnA Bot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFF8E7 0%, #FFF4E6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #7A0019;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            color: #5A0013;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 12px 20px;
+            background: #FF6A00;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: #E55A00;
+            transform: translateY(-2px);
+        }
+
+        /* Session Selection */
+        .session-selection {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(122, 0, 25, 0.1);
+            border: 3px solid #FFF4E6;
+        }
+
+        .session-title {
+            color: #7A0019;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .audio-info {
+            background: linear-gradient(135deg, #FFF8E7 0%, white 100%);
+            border: 2px solid #FF6A00;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: #7A0019;
+        }
+
+        .audio-info-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .audio-details {
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        .session-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .session-option {
+            background: linear-gradient(135deg, #FF6A00 0%, #FF4500 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .session-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 106, 0, 0.3);
+        }
+
+        .session-option.selected {
+            background: linear-gradient(135deg, #7A0019 0%, #5A0013 100%);
+            border: 3px solid #FFD700;
+        }
+
+        .option-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .option-duration {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .calculated-time {
+            font-size: 0.8rem;
+            color: #FFD700;
+            font-style: italic;
+        }
+
+        /* Practice Session */
+        .practice-session {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(122, 0, 25, 0.1);
+            border: 3px solid #FFF4E6;
+            display: none;
+        }
+
+        .practice-session.active {
+            display: block;
+        }
+
+        /* Image Slideshow */
+        .image-container {
+         position: relative;
+         width: 100%;
+         max-width: 600px;     /* Wider container */
+         height: 500px;        /* Taller container */
+         margin: 0 auto 20px;
+         border-radius: 15px;
+         overflow: hidden;
+         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+         background: linear-gradient(135deg, #7A0019, #5A0013);
+         display: flex;
+         align-items: center;
+         justify-content: center;
+       }
+
+     .slideshow-image {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;  /* ← This will show full image */
+        opacity: 0;
+        transition: opacity 1.5s ease-in-out;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);  /* ← Centers the image */
+       }
+
+        .slideshow-image.active {
+            opacity: 1;
+        }
+
+        .image-loading {
+            color: white;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        .image-loading.show {
+            display: block;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .maharaj-blessing {
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* Counter Display */
+        .counter-display {
+            background: linear-gradient(135deg, #7A0019 0%, #5A0013 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
+        .counter-item {
+            text-align: center;
+        }
+
+        .counter-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFD700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .counter-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            height: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #FFD700 0%, #FF6A00 100%);
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Audio Controls */
+        .audio-section {
+            background: linear-gradient(135deg, #FF6A00 0%, #FF4500 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .audio-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .control-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .primary-btn {
+            background: white;
+            color: #FF6A00;
+        }
+
+        .primary-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .primary-btn:disabled {
+            background: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .secondary-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+        }
+
+        .audio-status {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Session Complete */
+        .session-complete {
+            background: linear-gradient(135deg, #FFD700 0%, #FF6A00 100%);
+            color: #7A0019;
+            border-radius: 15px;
+            padding: 25px;
+            display: none;
+            text-align: center;
+        }
+
+        .session-complete.show {
+            display: block;
+        }
+
+        .complete-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .complete-message {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .complete-stats {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #7A0019;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #5A0013;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .session-options {
+                grid-template-columns: 1fr;
+            }
+
+            .counter-display {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .counter-number {
+                font-size: 2rem;
+            }
+
+            .image-container {
+                height: 400px;
+            }
+
+            .audio-controls {
+                gap: 10px;
+            }
+
+            .control-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .celebrating {
+            animation: celebration 0.5s ease-in-out 3;
+        }
+
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+
+        .fade-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🙏 Guided Ram Ram Practice</h1>
+            <p>Follow Maharaj-ji's divine presence with sacred chanting and imagery</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">← Back to QnA</a>
+            <a href="daily-darshan.html" class="nav-btn">Daily Darshan</a>
+            <a href="guided-meditation.html" class="nav-btn">Meditation</a>
+        </div>
+
+        <!-- Session Selection -->
+        <div class="session-selection" id="sessionSelection">
+            <div class="session-title">🎵 Choose Your Guided Practice</div>
+            
+            <div class="audio-info">
+                <div class="audio-info-title">🎙️ Audio Details</div>
+                <div class="audio-details">
+                    10-minute sacred chanting • Simply choose your session • Start chanting with Baba now! 
+                </div>
+            </div>
+
+            <div class="session-options">
+                <button class="session-option" data-count="108" data-duration="1.3">
+                    <span class="option-count">108</span>
+                    <span class="option-duration">Ram Ram</span>
+                    <div class="calculated-time">≈ 1.3 minutes</div>
+                </button>
+                <button class="session-option" data-count="216" data-duration="2.5">
+                    <span class="option-count">216</span>
+                    <span class="option-duration">Ram Ram</span>
+                    <div class="calculated-time">≈ 2.5 minutes</div>
+                </button>
+                <button class="session-option" data-count="500" data-duration="5.9">
+                    <span class="option-count">500</span>
+                    <span class="option-duration">Ram Ram</span>
+                    <div class="calculated-time">≈ 5.9 minutes</div>
+                </button>
+                <button class="session-option" data-count="1008" data-duration="11.9">
+                    <span class="option-count">1008</span>
+                    <span class="option-duration">Ram Ram</span>
+                    <div class="calculated-time">≈ 11.9 minutes</div>
+                </button>
+            </div>
+            
+            <button class="nav-btn" id="startPractice" style="opacity: 0.5; pointer-events: none;">
+                🙏 Start Guided Practice
+            </button>
+        </div>
+
+        <!-- Practice Session -->
+        <div class="practice-session" id="practiceSession">
+            <!-- Image Slideshow -->
+            <div class="image-container">
+                <div class="image-loading show" id="imageLoading">🙏 Loading Maharaj-ji's divine presence...</div>
+                <img class="slideshow-image" id="currentImage" alt="Neem Karoli Baba" style="display: none;">
+                <div class="image-overlay">
+                    <div class="maharaj-blessing" id="blessingText">🙏 Ram Ram - Maharaj-ji's blessings are with you</div>
+                </div>
+            </div>
+
+            <!-- Counter Display -->
+            <div class="counter-display">
+                <div class="counter-item">
+                    <span class="counter-number" id="currentCount">0</span>
+                    <span class="counter-label">Current Count</span>
+                </div>
+                <div class="counter-item">
+                    <span class="counter-number" id="targetCount">108</span>
+                    <span class="counter-label">Target</span>
+                </div>
+                <div class="counter-item">
+                    <span class="counter-number" id="remainingCount">108</span>
+                    <span class="counter-label">Remaining</span>
+                </div>
+                <div class="counter-item">
+                    <span class="counter-number" id="sessionTime">0:00</span>
+                    <span class="counter-label">Time Elapsed</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Audio Controls -->
+            <div class="audio-section">
+                <div class="audio-controls">
+                    <button class="control-btn primary-btn" id="playPauseBtn">▶ Start Practice</button>
+                    <button class="control-btn secondary-btn" id="resetBtn">🔄 Reset</button>
+                    <button class="control-btn secondary-btn" id="completeBtn">✓ Complete Now</button>
+                    
+                    <div class="volume-control">
+                        <span>🔊</span>
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.1" value="0.7">
+                    </div>
+                </div>
+                <div class="audio-status" id="audioStatus">
+                    🎵 10-minute chanting will loop automatically for your session duration
+                </div>
+            </div>
+
+            <div class="audio-controls" style="justify-content: center; background: none; padding: 0;">
+                <button class="control-btn" id="backToSelection" style="background: #7A0019; color: white; border: none;">← Choose Different Session</button>
+            </div>
+        </div>
+
+        <!-- Session Complete -->
+        <div class="session-complete" id="sessionComplete">
+            <div class="complete-title">🎉 Practice Complete!</div>
+            <div class="complete-message">
+                Maharaj-ji's blessings have filled your heart. Your devotional practice has been recorded with love.
+            </div>
+            
+            <div class="complete-stats">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="completedCount">108</span>
+                        <span class="stat-label">Ram Ram Completed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="actualDuration">1:18</span>
+                        <span class="stat-label">Practice Duration</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="todayTotal">324</span>
+                        <span class="stat-label">Today's Total</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="overallTotal">2,156</span>
+                        <span class="stat-label">Lifetime Total</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="audio-controls" style="background: none; padding: 0;">
+                <button class="control-btn" id="anotherSession" style="background: #FF6A00; color: white; border: none;">🙏 Another Session</button>
+                <button class="control-btn" id="shareProgress" style="background: #7A0019; color: white; border: none;">📱 Share Progress</button>
+            </div>
+        </div>
+
+        <!-- Hidden Audio Element -->
+        <audio id="ramRamAudio" preload="auto" loop>
+            <source src="<source src="Ram-Ram-Audio-9min52sec.mp4" type="video/mp4">" type="video/mp4">
+            <source src="Ram-Ram-Audio-9min52sec.wav" type="audio/wav">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <script>
+        class GuidedRamRamPractice {
+            constructor() {
+                // Constants
+                this.RAM_RAM_PACE = 85; // Ram Ram per minute in your audio
+                this.AUDIO_DURATION_MINUTES = 9.87; // Your audio file duration
+                this.TOTAL_IMAGES = 168; // Total Baba images available
+                
+                // Session state
+                this.selectedSession = null;
+                this.isPlaying = false;
+                this.isPaused = false;
+                this.startTime = null;
+                this.pausedDuration = 0;
+                this.currentCount = 0;
+                this.targetCount = 108;
+                this.sessionDurationMs = 0;
+                
+                // Intervals and timeouts
+                this.countingInterval = null;
+                this.imageChangeTimeout = null;
+                this.sessionCompleteTimeout = null;
+                
+                // Image management
+                this.currentImageIndex = 0;
+                this.usedImages = new Set();
+                this.imagePreloadQueue = [];
+                this.isLoadingImage = false;
+                
+                // Data
+                this.sessionData = this.loadSessionData();
+                
+                this.blessings = [
+                    "🙏 Ram Ram - Maharaj-ji's love surrounds you",
+                    "✨ Feel the divine presence in each chant",
+                    "🌸 Your devotion is blossoming beautifully",
+                    "💝 Maharaj-ji's grace flows through you",
+                    "🕉️ Each Ram Ram brings you closer to the divine",
+                    "🌟 Your heart is opening to infinite love",
+                    "💫 Sacred energy fills every cell of your being",
+                    "🌺 Divine peace descends upon you",
+                    "🎭 Maharaj-ji smiles at your dedication",
+                    "🌙 Sacred vibrations heal and bless you",
+                    "🏔️ Kainchi Dham's blessings flow to you",
+                    "🌈 Divine light illuminates your path",
+                    "🦋 Your soul dances with joy in devotion",
+                    "🌊 Ocean of love washes over you",
+                    "⭐ You are held in infinite grace"
+                ];
+                
+                this.initializeElements();
+                this.attachEventListeners();
+                this.updateCalculatedTimes();
+                this.preloadFirstImage();
+            }
+
+            initializeElements() {
+                this.audio = document.getElementById('ramRamAudio');
+                this.volumeSlider = document.getElementById('volumeSlider');
+                this.currentImage = document.getElementById('currentImage');
+                this.imageLoading = document.getElementById('imageLoading');
+                this.blessingText = document.getElementById('blessingText');
+                this.audioStatus = document.getElementById('audioStatus');
+                
+                // Counter elements
+                this.currentCountEl = document.getElementById('currentCount');
+                this.targetCountEl = document.getElementById('targetCount');
+                this.remainingCountEl = document.getElementById('remainingCount');
+                this.sessionTimeEl = document.getElementById('sessionTime');
+                this.progressFill = document.getElementById('progressFill');
+                
+                // Set initial volume
+                this.audio.volume = this.volumeSlider.value;
+            }
+
+            attachEventListeners() {
+                // Session selection
+                document.querySelectorAll('.session-option').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.selectSession(e));
+                });
+
+                document.getElementById('startPractice').addEventListener('click', () => this.startPracticeSession());
+
+                // Practice controls
+                document.getElementById('playPauseBtn').addEventListener('click', () => this.togglePractice());
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetSession());
+                document.getElementById('completeBtn').addEventListener('click', () => this.completeSession());
+                document.getElementById('backToSelection').addEventListener('click', () => this.backToSelection());
+
+                // Volume control
+                this.volumeSlider.addEventListener('input', () => {
+                    this.audio.volume = this.volumeSlider.value;
+                });
+
+                // Session complete controls
+                document.getElementById('anotherSession').addEventListener('click', () => this.backToSelection());
+                document.getElementById('shareProgress').addEventListener('click', () => this.shareProgress());
+
+                // Audio events
+                this.audio.addEventListener('loadeddata', () => this.audioLoaded());
+                this.audio.addEventListener('error', () => this.audioError());
+                this.audio.addEventListener('ended', () => this.audioEnded());
+            }
+
+            updateCalculatedTimes() {
+                // Update display with pre-calculated durations based on 85 Ram Ram/minute
+                document.querySelectorAll('.session-option').forEach(btn => {
+                    const count = parseInt(btn.dataset.count);
+                    const minutes = (count / this.RAM_RAM_PACE).toFixed(1);
+                    btn.querySelector('.calculated-time').textContent = `≈ ${minutes} minutes`;
+                    btn.dataset.duration = minutes;
+                });
+            }
+
+            selectSession(e) {
+                // Remove previous selection
+                document.querySelectorAll('.session-option').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+
+                // Select current
+                const selectedBtn = e.target.closest('.session-option');
+                selectedBtn.classList.add('selected');
+                
+                this.selectedSession = {
+                    count: parseInt(selectedBtn.dataset.count),
+                    duration: parseFloat(selectedBtn.dataset.duration)
+                };
+
+                // Enable start button
+                const startBtn = document.getElementById('startPractice');
+                startBtn.style.opacity = '1';
+                startBtn.style.pointerEvents = 'auto';
+                startBtn.textContent = `🙏 Start ${this.selectedSession.count} Ram Ram Practice`;
+            }
+
+            startPracticeSession() {
+                if (!this.selectedSession) return;
+
+                this.targetCount = this.selectedSession.count;
+                this.currentCount = 0;
+                this.sessionDurationMs = this.selectedSession.duration * 60 * 1000; // Convert to milliseconds
+                this.startTime = null;
+                this.pausedDuration = 0;
+
+                // Hide setup, show practice
+                document.getElementById('sessionSelection').style.display = 'none';
+                document.getElementById('practiceSession').classList.add('active');
+
+                // Update display
+                this.targetCountEl.textContent = this.targetCount;
+                this.updateCounterDisplay();
+
+                // Update audio status
+                const loops = Math.ceil(this.selectedSession.duration / this.AUDIO_DURATION_MINUTES);
+                this.audioStatus.textContent = `🎵 10-minute audio will loop ${loops} time${loops > 1 ? 's' : ''} for ${this.selectedSession.duration} minutes`;
+
+                // Load first random image
+                this.loadRandomImage();
+            }
+
+            togglePractice() {
+                if (!this.isPlaying) {
+                    // Start or resume practice
+                    if (!this.startTime) {
+                        // Starting fresh
+                        this.startTime = Date.now();
+                    } else {
+                        // Resuming - adjust start time to account for pause
+                        this.startTime = Date.now() - (this.getElapsedTime() - this.pausedDuration);
+                    }
+                    
+                    this.isPlaying = true;
+                    this.isPaused = false;
+                    
+                    // Start audio
+                    this.audio.play().catch(e => {
+                        console.warn('Audio play failed:', e);
+                        this.showAudioError();
+                    });
+                    
+                    document.getElementById('playPauseBtn').innerHTML = '⏸️ Pause';
+                    
+                    // Start counting and image rotation
+                    this.startCounting();
+                    this.scheduleImageChange();
+                    this.scheduleSessionComplete();
+                    
+                } else {
+                    // Pause practice
+                    this.pausedDuration = this.getElapsedTime();
+                    this.isPlaying = false;
+                    this.isPaused = true;
+                    
+                    this.audio.pause();
+                    document.getElementById('playPauseBtn').innerHTML = '▶ Resume';
+                    
+                    // Stop intervals
+                    this.stopCounting();
+                    this.clearTimeouts();
+                }
+            }
+
+            startCounting() {
+                // Update counter every second based on elapsed time and pace
+                this.countingInterval = setInterval(() => {
+                    if (this.isPlaying) {
+                        const elapsedMinutes = this.getElapsedTime() / (1000 * 60);
+                        this.currentCount = Math.floor(elapsedMinutes * this.RAM_RAM_PACE);
+                        
+                        // Cap at target
+                        if (this.currentCount > this.targetCount) {
+                            this.currentCount = this.targetCount;
+                        }
+                        
+                        this.updateCounterDisplay();
+                        this.updateProgress();
+                    }
+                }, 1000);
+            }
+
+            stopCounting() {
+                if (this.countingInterval) {
+                    clearInterval(this.countingInterval);
+                    this.countingInterval = null;
+                }
+            }
+
+            scheduleImageChange() {
+                // Change image every 8-12 seconds (randomized)
+                const changeImage = () => {
+                    if (this.isPlaying) {
+                        this.loadRandomImage();
+                        this.changeBlessingText();
+                    }
+                    
+                    if (this.isPlaying && this.getElapsedTime() < this.sessionDurationMs) {
+                        // Schedule next change
+                        const nextInterval = 8000 + Math.random() * 4000; // 8-12 seconds
+                        this.imageChangeTimeout = setTimeout(changeImage, nextInterval);
+                    }
+                };
+                
+                // First change after 8 seconds
+                if (this.getElapsedTime() < this.sessionDurationMs) {
+                    this.imageChangeTimeout = setTimeout(changeImage, 8000);
+                }
+            }
+
+            scheduleSessionComplete() {
+                // Auto-complete when session duration is reached
+                const remainingTime = this.sessionDurationMs - this.getElapsedTime();
+                
+                if (remainingTime > 0) {
+                    this.sessionCompleteTimeout = setTimeout(() => {
+                        if (this.isPlaying) {
+                            this.autoCompleteSession();
+                        }
+                    }, remainingTime);
+                }
+            }
+
+            clearTimeouts() {
+                if (this.imageChangeTimeout) {
+                    clearTimeout(this.imageChangeTimeout);
+                    this.imageChangeTimeout = null;
+                }
+                if (this.sessionCompleteTimeout) {
+                    clearTimeout(this.sessionCompleteTimeout);
+                    this.sessionCompleteTimeout = null;
+                }
+            }
+
+            getElapsedTime() {
+                if (!this.startTime) return 0;
+                return Date.now() - this.startTime;
+            }
+
+            loadRandomImage() {
+                if (this.isLoadingImage) return;
+                this.isLoadingImage = true;
+
+                // Get random image that hasn't been used in this session
+                let randomIndex;
+                let attempts = 0;
+                do {
+                    randomIndex = Math.floor(Math.random() * this.TOTAL_IMAGES) + 1;
+                    attempts++;
+                } while (this.usedImages.has(randomIndex) && this.usedImages.size < this.TOTAL_IMAGES && attempts < 10);
+
+                // If we've used all images, reset the used set
+                if (this.usedImages.size >= this.TOTAL_IMAGES) {
+                    this.usedImages.clear();
+                }
+
+                this.usedImages.add(randomIndex);
+                this.loadImage(randomIndex);
+            }
+
+            loadImage(imageIndex) {
+                const img = new Image();
+                const imagePath = `images/darshan/nkb-${imageIndex}.jpg`;
+                
+                img.onload = () => {
+                    // Fade out current image
+                    this.currentImage.classList.remove('active');
+                    this.imageLoading.classList.remove('show');
+                    
+                    setTimeout(() => {
+                        this.currentImage.src = imagePath;
+                        this.currentImage.style.display = 'block';
+                        this.currentImage.classList.add('active');
+                        this.currentImageIndex = imageIndex;
+                        this.isLoadingImage = false;
+                    }, 500);
+
+                    // Preload next random image
+                    this.preloadNextImage();
+                };
+
+                img.onerror = () => {
+                    console.warn(`Failed to load image: ${imagePath}`);
+                    this.usedImages.delete(imageIndex);
+                    this.isLoadingImage = false;
+                    
+                    // Try loading another image
+                    if (this.isPlaying) {
+                        setTimeout(() => this.loadRandomImage(), 1000);
+                    }
+                };
+
+                img.src = imagePath;
+            }
+
+            preloadFirstImage() {
+                // Load first image on page load
+                this.loadImage(1);
+            }
+
+            preloadNextImage() {
+                // Preload a random image for smoother transitions
+                if (this.imagePreloadQueue.length < 2) {
+                    let nextIndex;
+                    do {
+                        nextIndex = Math.floor(Math.random() * this.TOTAL_IMAGES) + 1;
+                    } while (this.usedImages.has(nextIndex) && this.usedImages.size < this.TOTAL_IMAGES);
+
+                    const img = new Image();
+                    img.src = `images/darshan/nkb-${nextIndex}.jpg`;
+                    this.imagePreloadQueue.push(nextIndex);
+                }
+            }
+
+            changeBlessingText() {
+                const randomBlessing = this.blessings[Math.floor(Math.random() * this.blessings.length)];
+                this.blessingText.classList.add('fade-transition');
+                this.blessingText.style.opacity = '0';
+                
+                setTimeout(() => {
+                    this.blessingText.textContent = randomBlessing;
+                    this.blessingText.style.opacity = '1';
+                }, 300);
+            }
+
+            updateCounterDisplay() {
+                this.currentCountEl.textContent = this.currentCount;
+                this.remainingCountEl.textContent = Math.max(0, this.targetCount - this.currentCount);
+                
+                // Update session time
+                if (this.startTime) {
+                    const elapsed = Math.floor(this.getElapsedTime() / 1000);
+                    const minutes = Math.floor(elapsed / 60);
+                    const seconds = elapsed % 60;
+                    this.sessionTimeEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+
+            updateProgress() {
+                const progress = Math.min((this.currentCount / this.targetCount) * 100, 100);
+                this.progressFill.style.width = `${progress}%`;
+            }
+
+            autoCompleteSession() {
+                // Ensure we hit the target count
+                this.currentCount = this.targetCount;
+                this.updateCounterDisplay();
+                this.updateProgress();
+                
+                // Complete after a brief delay
+                setTimeout(() => {
+                    this.completeSession();
+                }, 1000);
+            }
+
+            completeSession() {
+                // Stop everything
+                this.isPlaying = false;
+                this.audio.pause();
+                this.stopCounting();
+                this.clearTimeouts();
+
+                // Save session data
+                this.saveSession();
+
+                // Show completion screen
+                document.getElementById('practiceSession').classList.remove('active');
+                document.getElementById('sessionComplete').classList.add('show');
+
+                // Update completion stats
+                this.updateCompletionStats();
+
+                // Add celebration effect
+                document.getElementById('sessionComplete').classList.add('celebrating');
+                setTimeout(() => {
+                    document.getElementById('sessionComplete').classList.remove('celebrating');
+                }, 1500);
+            }
+
+            saveSession() {
+                const actualDuration = Math.floor(this.getElapsedTime() / 1000);
+                const sessionRecord = {
+                    date: new Date().toDateString(),
+                    count: this.currentCount,
+                    target: this.targetCount,
+                    duration: actualDuration,
+                    completed: this.currentCount >= this.targetCount
+                };
+
+                this.sessionData.sessions.push(sessionRecord);
+                this.sessionData.totalCount += this.currentCount;
+                
+                // Update today's count and streak
+                const today = new Date().toDateString();
+                if (this.sessionData.lastDate !== today) {
+                    // New day - update streak
+                    if (this.sessionData.lastDate) {
+                        const lastDate = new Date(this.sessionData.lastDate);
+                        const currentDate = new Date(today);
+                        const dayDiff = Math.ceil((currentDate.getTime() - lastDate.getTime()) / (1000 * 3600 * 24));
+                        
+                        if (dayDiff === 1) {
+                            this.sessionData.streak = (this.sessionData.streak || 0) + 1;
+                        } else if (dayDiff > 1) {
+                            this.sessionData.streak = 1;
+                        }
+                    } else {
+                        this.sessionData.streak = 1;
+                    }
+                    
+                    this.sessionData.lastDate = today;
+                    this.sessionData.todayCount = this.currentCount;
+                } else {
+                    // Same day - add to today's count
+                    this.sessionData.todayCount += this.currentCount;
+                }
+
+                this.saveSessionData();
+            }
+
+            updateCompletionStats() {
+                document.getElementById('completedCount').textContent = this.currentCount;
+                
+                const duration = Math.floor(this.getElapsedTime() / 1000);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                document.getElementById('actualDuration').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('todayTotal').textContent = this.sessionData.todayCount.toLocaleString();
+                document.getElementById('overallTotal').textContent = this.sessionData.totalCount.toLocaleString();
+            }
+
+            resetSession() {
+                if (confirm('Are you sure you want to reset this session? All progress will be lost.')) {
+                    // Stop everything
+                    this.isPlaying = false;
+                    this.audio.pause();
+                    this.audio.currentTime = 0;
+                    this.stopCounting();
+                    this.clearTimeouts();
+
+                    // Reset counters
+                    this.currentCount = 0;
+                    this.startTime = null;
+                    this.pausedDuration = 0;
+
+                    // Reset UI
+                    document.getElementById('playPauseBtn').innerHTML = '▶ Start Practice';
+                    this.updateCounterDisplay();
+                    this.updateProgress();
+
+                    // Reset images
+                    this.usedImages.clear();
+                    this.loadRandomImage();
+                }
+            }
+
+            backToSelection() {
+                // Stop everything
+                this.isPlaying = false;
+                this.audio.pause();
+                this.audio.currentTime = 0;
+                this.stopCounting();
+                this.clearTimeouts();
+
+                // Reset session state
+                this.currentCount = 0;
+                this.startTime = null;
+                this.pausedDuration = 0;
+                this.selectedSession = null;
+
+                // Reset UI
+                document.getElementById('playPauseBtn').innerHTML = '▶ Start Practice';
+                this.updateCounterDisplay();
+                this.updateProgress();
+
+                // Show selection, hide others
+                document.getElementById('sessionSelection').style.display = 'block';
+                document.getElementById('practiceSession').classList.remove('active');
+                document.getElementById('sessionComplete').classList.remove('show');
+
+                // Clear selection
+                document.querySelectorAll('.session-option').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+
+                const startBtn = document.getElementById('startPractice');
+                startBtn.style.opacity = '0.5';
+                startBtn.style.pointerEvents = 'none';
+                startBtn.textContent = '🙏 Start Guided Practice';
+
+                // Reset images
+                this.usedImages.clear();
+                this.imagePreloadQueue = [];
+            }
+
+            shareProgress() {
+                const message = `🙏 Just completed ${this.currentCount} Ram Ram with Maharaj-ji's divine guidance!\n\n📿 Today's total: ${this.sessionData.todayCount.toLocaleString()}\n🌟 Lifetime total: ${this.sessionData.totalCount.toLocaleString()}\n🔥 Streak: ${this.sessionData.streak} days\n\nJoin me in guided Ram Ram practice with sacred imagery and chanting: ${window.location.href}`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Guided Ram Ram Practice Complete',
+                        text: message
+                    });
+                } else {
+                    navigator.clipboard.writeText(message).then(() => {
+                        alert('🙏 Progress copied to clipboard! Share your spiritual practice with others.');
+                    }).catch(() => {
+                        alert(`Share your spiritual journey:\n\n${message}`);
+                    });
+                }
+            }
+
+            audioLoaded() {
+                console.log('Audio loaded successfully');
+            }
+
+            audioError() {
+                this.audioStatus.textContent = '⚠️ Audio unavailable - practice in silence with visual guidance';
+                this.audioStatus.style.color = '#FF6A00';
+            }
+
+            audioEnded() {
+                // This shouldn't happen due to loop attribute, but handle just in case
+                if (this.isPlaying && this.getElapsedTime() < this.sessionDurationMs) {
+                    this.audio.play().catch(e => console.warn('Audio restart failed:', e));
+                }
+            }
+
+            showAudioError() {
+                this.audioStatus.textContent = '🔇 Audio requires user interaction - click play again';
+                this.audioStatus.style.color = '#FF6A00';
+            }
+
+            loadSessionData() {
+                const defaultData = {
+                    totalCount: 0,
+                    todayCount: 0,
+                    streak: 0,
+                    lastDate: null,
+                    sessions: []
+                };
+
+                try {
+                    const stored = localStorage.getItem('guidedRamRamData');
+                    const data = stored ? { ...defaultData, ...JSON.parse(stored) } : defaultData;
+                    
+                    // Reset today's count if new day
+                    const today = new Date().toDateString();
+                    if (data.lastDate !== today) {
+                        data.todayCount = 0;
+                    }
+                    
+                    return data;
+                } catch (e) {
+                    return defaultData;
+                }
+            }
+
+            saveSessionData() {
+                try {
+                    localStorage.setItem('guidedRamRamData', JSON.stringify(this.sessionData));
+                } catch (e) {
+                    console.warn('Could not save session data');
+                }
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            new GuidedRamRamPractice();
+        });
+    </script>
+</body>
+</html>
