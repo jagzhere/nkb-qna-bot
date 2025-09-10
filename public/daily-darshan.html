@@ -78,13 +78,14 @@
         }
 
         .darshan-image img {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            transition: transform 0.3s ease;
-        }
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+}
 
         .darshan-image img:hover {
             transform: scale(1.05);
@@ -162,9 +163,10 @@
 
         /* Mobile Responsive */
         @media (max-width: 768px) {
-            .darshan-card {
-                padding: 30px 20px;
-            }
+    .darshan-image img {
+        width: 350px;
+        height: 350px;
+    }
 
             .darshan-image img {
                 width: 150px;
