@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NKB QnA Bot - Devotees' Stories</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NYD75PMBK3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      
+      gtag('config', 'G-NYD75PMBK3', {
+        // Enhanced ecommerce for freemium tracking
+        send_page_view: true,
+        custom_map: {
+          'custom_dimension_1': 'user_type',
+          'custom_dimension_2': 'question_topic', 
+          'custom_dimension_3': 'language_preference',
+          'custom_dimension_4': 'stories_found',
+          'custom_dimension_5': 'similarity_score'
+        }
+      });
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -533,11 +554,18 @@
             text-decoration: none;
             font-weight: 500;
             transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .instagram-link:hover {
             color: #E55A00;
             text-decoration: underline;
+        }
+
+        .instagram-icon {
+            font-size: 1.1rem;
         }
 
         .divider {
@@ -713,7 +741,8 @@
         <div class="footer">
             <div class="footer-content">
                 <a href="https://instagram.com/omnipresent.divinity" target="_blank" class="instagram-link">
-                    📷 @omnipresent.divinity
+                    <span class="instagram-icon">📸</span>
+                    @omnipresent.divinity
                 </a>
                 <span class="divider">•</span>
                 <span class="made-with">
@@ -728,58 +757,113 @@
         let loadedStoryCount = 0;
         let currentLanguage = 'english';
 
-        // Analytics Integration - ENHANCED
+        // Analytics Integration - Enhanced for GA4
         let currentSessionId = null;
         let sessionStartTime = new Date();
+        let userType = 'new'; // Track user progression: new -> engaged -> power_user
 
         // Generate session ID
         function generateSessionId() {
             return `${currentFingerprint}-${Date.now()}`;
         }
 
-        // FIXED: Track analytics with proper error handling
-        async function trackAnalytics(action, data = {}) {
-            try {
-                console.log(`Tracking analytics: ${action}`, data);
-                const response = await fetch('/api/analytics', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action,
-                        fingerprint: currentFingerprint,
-                        sessionId: currentSessionId,
-                        timestamp: new Date().toISOString(),
-                        ...data
-                    })
+        // Google Analytics 4 Enhanced Tracking
+        function trackGA4Event(eventName, parameters = {}) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, {
+                    event_category: 'nkb_qna',
+                    ...parameters,
+                    // Custom dimensions for freemium analysis
+                    custom_dimension_1: userType,
+                    custom_dimension_2: parameters.topic || '',
+                    custom_dimension_3: currentLanguage,
+                    custom_dimension_4: parameters.stories_found || '',
+                    custom_dimension_5: parameters.similarity_score || ''
                 });
-                
-                if (response.ok) {
-                    console.log(`Analytics ${action} tracked successfully`);
-                } else {
-                    console.error(`Analytics ${action} failed:`, response.status);
-                }
-            } catch (error) {
-                console.log(`Analytics ${action} failed:`, error);
+                console.log(`GA4 Event: ${eventName}`, parameters);
             }
         }
 
-        // Track page view
-        async function trackPageView(page = window.location.pathname, referrer = document.referrer) {
-            await trackAnalytics('page_view', {
-                page,
-                referrer,
-                userAgent: navigator.userAgent,
+        // Track page view with enhanced parameters
+        function trackPageView(page = window.location.pathname) {
+            trackGA4Event('page_view', {
+                page_title: document.title,
+                page_location: window.location.href,
+                page: page,
+                language: currentLanguage,
+                user_type: userType
+            });
+        }
+
+        // Track feature usage
+        function trackFeatureUsage(feature, action = 'use', value = null) {
+            trackGA4Event('feature_usage', {
+                feature_name: feature,
+                action: action,
+                value: value,
                 language: currentLanguage
             });
         }
 
-        // Track feature usage with specific actions
-        async function trackFeatureUsage(feature, action = 'use') {
-            await trackAnalytics('feature_usage', {
-                feature,
-                action,
-                language: currentLanguage
+        // Track question submission with detailed parameters
+        function trackQuestionSubmission(questionData) {
+            trackGA4Event('question_asked', {
+                topic: questionData.topic,
+                question_length: questionData.questionLength,
+                language: questionData.language,
+                has_results: questionData.hasResults,
+                similarity_score: questionData.similarityScore,
+                stories_count: questionData.storiesCount || 0,
+                event_value: questionData.hasResults ? 1 : 0
             });
+            
+            // Track as conversion for freemium analysis
+            if (questionData.hasResults) {
+                trackGA4Event('successful_question', {
+                    currency: 'USD',
+                    value: 1.0, // Assign value for conversion tracking
+                    topic: questionData.topic
+                });
+            }
+        }
+
+        // Track rate limit hits (key freemium metric)
+        function trackRateLimit() {
+            trackGA4Event('rate_limit_hit', {
+                event_value: 1,
+                user_type: 'power_user' // User hitting limits = conversion candidate
+            });
+            userType = 'power_user'; // Upgrade user type
+        }
+
+        // Track story interactions
+        function trackStoryInteraction(action, storyData = {}) {
+            trackGA4Event('story_interaction', {
+                action: action, // 'expand', 'collapse', 'read_full'
+                story_id: storyData.id || '',
+                story_title: storyData.title || '',
+                similarity_score: storyData.similarity || ''
+            });
+        }
+
+        // Track user engagement level
+        function trackEngagementLevel() {
+            const timeOnPage = (Date.now() - sessionStartTime) / 1000;
+            let engagementLevel = 'low';
+            
+            if (timeOnPage > 180) engagementLevel = 'high'; // 3+ minutes
+            else if (timeOnPage > 60) engagementLevel = 'medium'; // 1+ minute
+            
+            trackGA4Event('engagement_level', {
+                level: engagementLevel,
+                time_on_page: Math.round(timeOnPage),
+                event_value: timeOnPage > 180 ? 1 : 0
+            });
+            
+            // Update user type based on engagement
+            if (timeOnPage > 180 && userType === 'new') {
+                userType = 'engaged';
+            }
         }
 
         // Translation object
@@ -907,10 +991,10 @@
             currentFingerprint = generateFingerprint();
             currentSessionId = generateSessionId();
             
-            console.log('Initializing analytics with fingerprint:', currentFingerprint);
+            console.log('Initializing with fingerprint:', currentFingerprint);
             
             // Track initial page view
-            await trackPageView();
+            trackPageView();
             
             // Add topic selection listeners
             document.querySelectorAll('input[name="topic"]').forEach(radio => {
@@ -928,6 +1012,9 @@
                     trackFeatureUsage('navigation', feature);
                 });
             });
+
+            // Track engagement after 30 seconds
+            setTimeout(trackEngagementLevel, 30000);
         });
 
         // Word count functionality
@@ -1014,7 +1101,9 @@
                 document.getElementById('loadingState').style.display = 'none';
 
                 if (response.status === 429) {
-                    // Rate limit exceeded
+                    // Rate limit exceeded - Track for freemium analysis
+                    trackRateLimit();
+                    
                     const limitMessage = currentLanguage === 'hindi' ? 
                         'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
                         'You\'ve reached your daily limit of 3 questions. Please try again tomorrow.';
@@ -1023,10 +1112,28 @@
                     return;
                 }
 
+                // Track question submission
+                const questionData = {
+                    topic: selectedTopic.value,
+                    questionLength: question.split(/\s+/).length,
+                    language: currentLanguage,
+                    hasResults: !data.fallback,
+                    similarityScore: data.stories?.[0]?.similarity || null,
+                    storiesCount: data.stories?.length || 0
+                };
+                trackQuestionSubmission(questionData);
+
                 if (data.fallback) {
                     // No matching stories found
                     document.getElementById('fallbackMessage').style.display = 'block';
                     document.getElementById('fallbackText').textContent = data.message;
+                    
+                    // Track failed search
+                    trackGA4Event('no_stories_found', {
+                        topic: selectedTopic.value,
+                        question_length: question.split(/\s+/).length,
+                        language: currentLanguage
+                    });
                     return;
                 }
 
@@ -1049,6 +1156,12 @@
                     'कुछ गलत हुआ। कृपया फिर कोशिश करें।' :
                     'Something went wrong. Please try again.';
                 document.getElementById('fallbackText').textContent = errorMessage;
+                
+                // Track error
+                trackGA4Event('question_error', {
+                    error_message: error.message,
+                    language: currentLanguage
+                });
             }
         });
 
@@ -1096,7 +1209,7 @@
                                     <strong>${sourceText}</strong> ${story.source_url}
                                 </div>
                             </div>
-                            <button class="read-more-btn" onclick="toggleStory('${storyId}')" id="btn-${storyId}">
+                            <button class="read-more-btn" onclick="toggleStory('${storyId}', '${story.id}', '${story.title}', ${story.similarity})" id="btn-${storyId}">
                                 ${readMoreText}
                             </button>
                         </div>
@@ -1197,8 +1310,8 @@
             document.getElementById('resultsContent').style.display = 'block';
         }
 
-        // Toggle story expand/collapse
-        function toggleStory(storyId) {
+        // Toggle story expand/collapse with GA tracking
+        function toggleStory(storyId, storyDbId, storyTitle, similarity) {
             const preview = document.getElementById(`preview-${storyId}`);
             const full = document.getElementById(`full-${storyId}`);
             const btn = document.getElementById(`btn-${storyId}`);
@@ -1209,12 +1322,24 @@
                 preview.style.display = 'none';
                 full.style.display = 'block';
                 btn.textContent = showLessText;
-                trackFeatureUsage('story-expansion', 'expand');
+                
+                // Track story expansion
+                trackStoryInteraction('expand', {
+                    id: storyDbId,
+                    title: storyTitle,
+                    similarity: similarity
+                });
             } else {
                 preview.style.display = 'block';
                 full.style.display = 'none';
                 btn.textContent = readMoreText;
-                trackFeatureUsage('story-expansion', 'collapse');
+                
+                // Track story collapse
+                trackStoryInteraction('collapse', {
+                    id: storyDbId,
+                    title: storyTitle,
+                    similarity: similarity
+                });
             }
         }
 
@@ -1222,10 +1347,12 @@
         async function submitFeedback(feedback) {
             console.log('Feedback:', feedback);
             
-            // Track feedback
-            await trackAnalytics('feedback', {
+            // Track feedback for conversion analysis
+            trackGA4Event('feedback_given', {
+                feedback_type: feedback,
                 helpful: feedback === 'yes',
-                language: currentLanguage
+                language: currentLanguage,
+                event_value: feedback === 'yes' ? 1 : 0
             });
             
             // Show thank you message
@@ -1251,17 +1378,24 @@
             
             loadedStoryCount = 0;
             updatePlaceholder(); // Reset placeholder
+            
+            // Track form reset
+            trackFeatureUsage('form-reset');
         }
 
-        // Enhanced session tracking
-        window.addEventListener('beforeunload', async function() {
-            await trackAnalytics('session_end');
+        // Enhanced session tracking for freemium analysis
+        window.addEventListener('beforeunload', function() {
+            trackEngagementLevel();
+            trackGA4Event('session_end', {
+                session_duration: Math.round((Date.now() - sessionStartTime) / 1000),
+                user_type: userType
+            });
         });
 
-        // Track visibility changes
+        // Track visibility changes for engagement analysis
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                trackAnalytics('session_end');
+                trackEngagementLevel();
             } else {
                 // User returned - track as session continuation if recent
                 const timeSinceStart = new Date() - sessionStartTime;
