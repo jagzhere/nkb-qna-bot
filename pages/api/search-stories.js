@@ -53,48 +53,6 @@ function cosineSimilarity(vectorA, vectorB) {
   return dotProduct / (normA * normB);
 }
 
-// Enhanced trackAnalytics function with more debugging
-async function trackAnalytics(action, data, req) {
-  try {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : `https://${req.headers.host}`;
-    
-    const fullUrl = `${baseUrl}/api/analytics`;
-    
-    console.log(`🔍 Tracking analytics: ${action} to ${fullUrl}`);
-    console.log(`🔍 Full tracking data:`, {
-      action,
-      timestamp: new Date().toISOString(),
-      ...data
-    });
-    
-    const response = await fetch(fullUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        action,
-        timestamp: new Date().toISOString(),
-        ...data
-      })
-    });
-    
-    console.log(`🔍 Response status: ${response.status} ${response.statusText}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`🔍 Analytics ${action} failed:`, response.status, response.statusText, errorText);
-    } else {
-      const responseData = await response.json();
-      console.log(`🔍 Analytics ${action} tracked successfully:`, responseData);
-    }
-  } catch (error) {
-    console.error(`🔍 Analytics ${action} error:`, error.message, error.stack);
-  }
-}
-
 // Translation helper
 async function translateText(text, targetLanguage) {
   if (targetLanguage === 'english') return text;
@@ -446,8 +404,7 @@ function generateSmartKeywords(topic, stories) {
 }
 
 export default async function handler(req, res) {
-  console.log('HANDLER EXECUTING AT', Date.now());
-  console.log('🔥 SEARCH-STORIES FILE UPDATED - NEW VERSION DEPLOYED 🔥');
+  console.log('🔥 SEARCH-STORIES API CALLED - GA4 VERSION');
   
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -465,11 +422,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Rate limiting
+    // Rate limiting - RESTORED
     const rateLimitResult = checkRateLimit(fingerprint, req.ip);
     if (!rateLimitResult.allowed) {
-      // Track rate limit hit
-      await trackAnalytics('rate_limit_hit', { fingerprint }, req);
+      console.log(`Rate limit hit for fingerprint: ${fingerprint}`);
       
       const limitMessage = language === 'hindi' ? 
         'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
@@ -558,35 +514,6 @@ export default async function handler(req, res) {
       const bestScore = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity || 0;
       console.log(`No stories above ${SIMILARITY_THRESHOLD} threshold. Best score: ${bestScore.toFixed(3)}`);
       
-      // Track failed question search with enhanced debug
-      console.log('🚨 === ABOUT TO TRACK QUESTION (NO STORIES) ===');
-      console.log('🚨 Tracking data:', {
-        fingerprint,
-        topic,
-        questionLength: cleanedQuestion.length,
-        language,
-        questionText: cleanedQuestion,
-        hasResults: false,
-        similarityScore: bestScore
-      });
-      console.log('🚨 Request host:', req.headers.host);
-      console.log('🚨 Vercel URL:', process.env.VERCEL_URL);
-
-      try {
-        await trackAnalytics('question_asked', {
-          fingerprint,
-          topic,
-          questionLength: cleanedQuestion.length,
-          language,
-          questionText: cleanedQuestion,
-          hasResults: false,
-          similarityScore: bestScore
-        }, req);
-        console.log('🚨 === QUESTION TRACKING COMPLETED SUCCESSFULLY (NO STORIES) ===');
-      } catch (error) {
-        console.error('🚨 === QUESTION TRACKING FAILED (NO STORIES) ===', error);
-      }
-      
       const smartKeywords = generateSmartKeywords(topic, stories);
       const keywordList = smartKeywords.slice(0, 4).map(k => `'${k}'`).join(', ');
       
@@ -645,40 +572,11 @@ export default async function handler(req, res) {
       }
     }
 
-    // Track successful question search with enhanced debug
-    console.log('🚨 === ABOUT TO TRACK QUESTION (WITH STORIES) ===');
-    console.log('🚨 Tracking data:', {
-      fingerprint,
-      topic,
-      questionLength: cleanedQuestion.length,
-      language,
-      questionText: cleanedQuestion,
-      hasResults: true,
-      similarityScore: relevantStories[0]?.similarity || null
-    });
-    console.log('🚨 Request host:', req.headers.host);
-    console.log('🚨 Vercel URL:', process.env.VERCEL_URL);
-
-    try {
-      await trackAnalytics('question_asked', {
-        fingerprint,
-        topic,
-        questionLength: cleanedQuestion.length,
-        language,
-        questionText: cleanedQuestion,
-        hasResults: true,
-        similarityScore: relevantStories[0]?.similarity || null
-      }, req);
-      console.log('🚨 === QUESTION TRACKING COMPLETED SUCCESSFULLY (WITH STORIES) ===');
-    } catch (error) {
-      console.error('🚨 === QUESTION TRACKING FAILED (WITH STORIES) ===', error);
-    }
-
     // Generate full response structure
     const response = {
       empathy,
       stories: storiesWithRelevance,
-      lessons, // New combined lessons section
+      lessons, // Combined lessons section
       reflection,
       community,
       practice,
@@ -687,6 +585,8 @@ export default async function handler(req, res) {
       remaining: rateLimitResult.remaining
     };
 
+    console.log(`✅ Question processed successfully. Stories found: ${relevantStories.length}, Remaining questions: ${rateLimitResult.remaining}`);
+    
     res.status(200).json(response);
 
   } catch (error) {
