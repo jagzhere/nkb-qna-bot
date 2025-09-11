@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guided Meditation - Ram Ram Practice</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NYD75PMBK3"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      
+      gtag('config', 'G-NYD75PMBK3', {
+        send_page_view: true
+      });
+    </script>
+    
     <style>
         * {
             margin: 0;
@@ -94,7 +107,7 @@
             margin: 0 auto;
         }
 
-        /* Instructions Section - FIXED */
+        /* Instructions Section */
         .instructions-section {
             background: linear-gradient(135deg, #f8f9fa, #ffffff);
             border-radius: 20px;
@@ -224,6 +237,54 @@
             left: 0;
         }
 
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            padding: 30px 20px;
+            border-top: 1px solid rgba(122, 0, 25, 0.1);
+            background: rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            color: #5A0013;
+        }
+
+        .instagram-link {
+            color: #FF6A00;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .instagram-link:hover {
+            color: #E55A00;
+            text-decoration: underline;
+        }
+
+        .instagram-icon {
+            font-size: 1.1rem;
+        }
+
+        .divider {
+            color: #7A0019;
+            font-weight: bold;
+        }
+
+        .made-with {
+            color: #7A0019;
+            font-style: italic;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .video-section {
@@ -250,6 +311,15 @@
             .benefits-grid {
                 grid-template-columns: 1fr;
             }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .divider {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -269,7 +339,7 @@
         <!-- Video Section -->
         <div class="video-section">
             <div class="video-container">
-                <video controls poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMzOCIgdmlld0JveD0iMCAwIDYwMCAzMzgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzE5N0E2MiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFEOTY3MyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI2MDAiIGhlaWdodD0iMzM4IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjMwMCIgY3k9IjE2OSIgcj0iNTAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45KSIvPjxwb2x5Z29uIHBvaW50cz0iMjg1LDE0NCAzMjUsMTY5IDI4NSwxOTQiIGZpbGw9IiM3QTAwMTkiLz48dGV4dCB4PSIzMDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPlJhbSBSYW0gTWVkaXRhdGlvbjwvdGV4dD48Y2lyY2xlIGN4PSIxNTAiIGN5PSI4MCIgcj0iMjAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4zKSIvPjx0ZXh0IHg9IjE1MCIgeT0iODciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjI0Ij7wn5mPPC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC44KSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsIj5SYW0gUmFtPC90ZXh0PjwvZz48L3N2Zz4=">
+                <video controls poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMzOCIgdmlld0JveD0iMCAwIDYwMCAzMzgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiZyIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3R5bGU9InN0b3AtY29sb3I6IzE5N0E2MiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6IzFEOTY3MyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHdpZHRoPSI2MDAiIGhlaWdodD0iMzM4IiBmaWxsPSJ1cmwoI2JnKSIvPjxjaXJjbGUgY3g9IjMwMCIgY3k9IjE2OSIgcj0iNTAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC45KSIvPjxwb2x5Z29uIHBvaW50cz0iMjg1LDE0NCAzMjUsMTY5IDI4NSwxOTQiIGZpbGw9IiM3QTAwMTkiLz48dGV4dCB4PSIzMDAiIHk9IjI1MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPlJhbSBSYW0gTWVkaXRhdGlvbjwvdGV4dD48Y2lyY2xlIGN4PSIxNTAiIGN5PSI4MCIgcj0iMjAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4zKSIvPjx0ZXh0IHg9IjE1MCIgeT0iODciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjI0Ij7wn5mPPC90ZXh0Pjx0ZXh0IHg9IjQ1MCIgeT0iMzAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC44KSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsIj5SYW0gUmFtPC90ZXh0PjwvZz48L3N2Zz4=" id="meditationVideo">
                     <source src="https://nkb-qna-bot.vercel.app/Ram-Ram-meditation.mp4" type="video/mp4">
                     Your browser does not support the video tag.
                 </video>
@@ -320,7 +390,7 @@
             </div>
         </div>
 
-        <!-- Practice Tips - FIXED -->
+        <!-- Practice Tips -->
         <div class="tips-section">
             <h3>Practice Tips</h3>
             <ul class="tips-list">
@@ -332,6 +402,102 @@
                 <li>Remember that Maharaj-ji is always with you during practice</li>
             </ul>
         </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <a href="https://instagram.com/omnipresent.divinity" target="_blank" class="instagram-link">
+                    <span class="instagram-icon">📸</span>
+                    @omnipresent.divinity
+                </a>
+                <span class="divider">•</span>
+                <span class="made-with">
+                    Made with HTML + Javascript + Maharajji's boundless love 💚
+                </span>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+
+    <script>
+        // Google Analytics 4 Enhanced Tracking
+        function trackGA4Event(eventName, parameters = {}) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, {
+                    event_category: 'nkb_qna',
+                    page_title: 'Guided Meditation',
+                    ...parameters
+                });
+                console.log(`GA4 Event: ${eventName}`, parameters);
+            }
+        }
+
+        // Track page view and meditation engagement
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track page view
+            trackGA4Event('page_view', {
+                page_title: 'Guided Meditation',
+                page_location: window.location.href
+            });
+
+            const video = document.getElementById('meditationVideo');
+            let videoStartTime = null;
+            let totalWatchTime = 0;
+            let lastPauseTime = 0;
+
+            // Track video interactions
+            video.addEventListener('play', function() {
+                videoStartTime = Date.now();
+                trackGA4Event('video_play', {
+                    video_title: 'Ram Ram Meditation',
+                    video_duration: video.duration || 0
+                });
+            });
+
+            video.addEventListener('pause', function() {
+                if (videoStartTime) {
+                    const sessionWatchTime = (Date.now() - videoStartTime) / 1000;
+                    totalWatchTime += sessionWatchTime;
+                    lastPauseTime = video.currentTime;
+                    
+                    trackGA4Event('video_pause', {
+                        video_title: 'Ram Ram Meditation',
+                        current_time: video.currentTime,
+                        watch_time: sessionWatchTime
+                    });
+                }
+            });
+
+            video.addEventListener('ended', function() {
+                if (videoStartTime) {
+                    const sessionWatchTime = (Date.now() - videoStartTime) / 1000;
+                    totalWatchTime += sessionWatchTime;
+                    
+                    trackGA4Event('video_complete', {
+                        video_title: 'Ram Ram Meditation',
+                        total_watch_time: totalWatchTime,
+                        video_duration: video.duration || 0,
+                        completion_rate: (totalWatchTime / (video.duration || 1)) * 100,
+                        event_value: 1 // Completed meditation = high value action
+                    });
+                }
+            });
+
+            // Track video milestones (25%, 50%, 75%)
+            video.addEventListener('timeupdate', function() {
+                const progress = (video.currentTime / video.duration) * 100;
+                
+                if (progress >= 25 && !video.milestone25) {
+                    video.milestone25 = true;
+                    trackGA4Event('video_milestone', {
+                        milestone: '25%',
+                        video_title: 'Ram Ram Meditation'
+                    });
+                }
+                if (progress >= 50 && !video.milestone50) {
+                    video.milestone50 = true;
+                    trackGA4Event('video_milestone', {
+                        milestone: '50%',
+                        video_title: 'Ram Ram Meditation'
+                    });
+                }
+                if
