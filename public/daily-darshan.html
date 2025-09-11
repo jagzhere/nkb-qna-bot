@@ -397,12 +397,18 @@
         ];
 
         function loadDailyDarshan() {
+            console.log('🔥 loadDailyDarshan function called'); // DEBUG LINE ADDED
+            
             const today = new Date();
             const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            
+            console.log('📅 Day of year:', dayOfYear); // EXTRA DEBUG
             
             const quoteIndex = dayOfYear % darshanQuotes.length;
             const imageIndex = dayOfYear % imageFilenames.length;
             const reflectionIndex = dayOfYear % reflections.length;
+            
+            console.log('📊 Indices - Quote:', quoteIndex, 'Image:', imageIndex, 'Reflection:', reflectionIndex); // EXTRA DEBUG
             
             // Set content
             document.getElementById('darshanQuote').textContent = darshanQuotes[quoteIndex];
@@ -414,12 +420,16 @@
                 day: 'numeric' 
             })}`;
             
+            console.log('✅ Text content set successfully');
+            
             // Set image with error handling
             const imagePath = `/images/darshan/${imageFilenames[imageIndex]}`;
             const imageElement = document.getElementById('darshanImage');
             
+            console.log('🖼️ Trying to load image:', imagePath); // EXTRA DEBUG
+            
             imageElement.onload = function() {
-                console.log('Daily Darshan image loaded successfully');
+                console.log('✅ Daily Darshan image loaded successfully');
                 
                 // Track darshan view
                 trackGA4Event('darshan_view', {
@@ -430,15 +440,18 @@
             };
             
             imageElement.onerror = function() {
-                console.log('Daily Darshan image not found, using placeholder');
+                console.log('❌ Daily Darshan image not found, using placeholder');
                 this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4zKSIvPjx0ZXh0IHg9IjEwMCIgeT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IndoaXRlIiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtd2VpZ2h0PSJib2xkIj5OZWVtIEthcm9saTwvdGV4dD48dGV4dCB4PSIxMDAiIHk9IjExNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtc2l6ZT0iMTgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC13ZWlnaHQ9ImJvbGQiPkJhYmE8L3RleHQ+PC9zdmc+';
             };
             
             imageElement.src = imagePath;
+            console.log('🔄 Image src set, waiting for load/error event');
         }
 
         // Track page view and darshan engagement
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded event fired');
+            
             // Track page view
             trackGA4Event('page_view', {
                 page_title: 'Daily Darshan',
@@ -465,3 +478,6 @@
                 source_page: 'daily_darshan'
             });
         });
+    </script>
+</body>
+</html>
