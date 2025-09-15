@@ -53,6 +53,30 @@ function cosineSimilarity(vectorA, vectorB) {
   return dotProduct / (normA * normB);
 }
 
+// QUESTION LOGGING FUNCTION - NEW
+function logQuestionToConsole(question, topic, language, fingerprint, hasResults, similarityScore) {
+  const timestamp = new Date().toISOString();
+  console.log('📝 === QUESTION LOGGED ===');
+  console.log(`Time: ${timestamp}`);
+  console.log(`Question: "${question}"`);
+  console.log(`Topic: ${topic}`);
+  console.log(`Language: ${language}`);
+  console.log(`User: ${fingerprint.substring(0, 8)}...`);
+  console.log(`Found Stories: ${hasResults ? 'YES' : 'NO'}`);
+  console.log(`Best Similarity: ${similarityScore ? similarityScore.toFixed(3) : 'N/A'}`);
+  console.log('========================');
+}
+
+// FEEDBACK LOGGING FUNCTION - NEW
+function logFeedbackToConsole(feedback, fingerprint) {
+  const timestamp = new Date().toISOString();
+  console.log('👍 === FEEDBACK LOGGED ===');
+  console.log(`Time: ${timestamp}`);
+  console.log(`Feedback: ${feedback}`);
+  console.log(`User: ${fingerprint.substring(0, 8)}...`);
+  console.log('=========================');
+}
+
 // Translation helper
 async function translateText(text, targetLanguage) {
   if (targetLanguage === 'english') return text;
@@ -404,7 +428,7 @@ function generateSmartKeywords(topic, stories) {
 }
 
 export default async function handler(req, res) {
-  console.log('🔥 SEARCH-STORIES API CALLED - GA4 VERSION');
+  console.log('🔥 SEARCH-STORIES API CALLED - WITH LOGGING');
   
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -422,10 +446,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Rate limiting - RESTORED
+    // ENHANCED RATE LIMITING DEBUG
+    console.log('🛡️ === RATE LIMIT CHECK ===');
+    console.log(`Checking rate limit for fingerprint: ${fingerprint}`);
+    console.log(`IP: ${req.ip || 'unknown'}`);
+    
     const rateLimitResult = checkRateLimit(fingerprint, req.ip);
+    console.log(`Rate limit result:`, rateLimitResult);
+    
     if (!rateLimitResult.allowed) {
-      console.log(`Rate limit hit for fingerprint: ${fingerprint}`);
+      console.log(`🚫 RATE LIMIT HIT for fingerprint: ${fingerprint}`);
       
       const limitMessage = language === 'hindi' ? 
         'आपने 3 प्रश्नों की दैनिक सीमा पूरी कर ली है। कृपया कल फिर कोशिश करें।' :
@@ -436,6 +466,7 @@ export default async function handler(req, res) {
         remaining: 0 
       });
     }
+    console.log(`✅ Rate limit passed. Remaining: ${rateLimitResult.remaining}`);
 
     // Clean question (remove salutations)
     const cleanedQuestion = question
@@ -508,6 +539,11 @@ export default async function handler(req, res) {
         console.log(`${i+1}. "${story.title}" - Score: ${story.similarity.toFixed(3)}`);
       });
     console.log('===============================');
+
+    // Log question for viewing - NEW
+    const hasResults = relevantStories.length > 0;
+    const bestSimilarity = scoredStories.sort((a, b) => b.similarity - a.similarity)[0]?.similarity;
+    logQuestionToConsole(cleanedQuestion, topic, language, fingerprint, hasResults, bestSimilarity);
 
     // If no relevant stories found, return smart fallback
     if (relevantStories.length === 0) {
